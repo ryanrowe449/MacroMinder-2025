@@ -1,0 +1,181 @@
+/* Dashboard Body old color #302c64 */
+body {
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    color: #ffffff;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+h1 {
+
+    text-shadow: -2px -2px 0 #000,  
+                  2px -2px 0 #000,
+                 -2px  2px 0 #000,
+                  2px  2px 0 #000;
+}
+
+/* Header */
+#header-bar {
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+    background: none;
+}
+
+.macro_graph .tm-block {
+    padding: 40px; /* Increased padding */
+}
+
+#macroGraphContainer {
+    width: 800px; /* Set the width to fill the entire container */
+    height: 500px;
+}
+
+#header-bar h1 {
+    margin: 0;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: 'Copperplate Gothic', sans-serif;
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Content Rows */
+.tm-content-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.tm-col {
+    flex: 1 1 auto;
+    max-width: 400px;
+}
+
+.extended-col {
+    flex: 1 1 auto;
+    max-width: 1000px;
+    margin-left: 20px;
+}
+
+.extended-col-big {
+    max-width: 1000px;
+    margin-left: 20px;
+}
+
+/* Blocks */
+.bg-white {
+    background-color: rgba(255, 255, 255, 0.8);;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
+    border: 1.5px solid black;
+    margin-bottom: 10px; 
+}
+
+.tm-block-title {
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+/* Habit Button */
+.habit-button {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 5px 10px;
+}
+
+.habit-description {
+    color: black;
+}
+
+/* Logout Button */
+.logout-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Adjust text color */
+#macros label {
+    color: black;
+}
+
+/* Adjust input width */
+#macros input[type="number"] {
+    width: 80px;
+}
+
+/* Adjust button */
+#macros button {
+    margin-top: 10px;
+}
+
+#macroDisplay {
+    color: black;
+}
+
+#macros .macros-container {
+    margin-bottom: 20px;
+}
+
+/* Habit Header */
+#habits-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#habits-header button {
+    background: transparent;
+    color: black;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.life-coach-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tm-life-coach-block {
+    width: 150px;
+    height: 300px;
+    position: absolute;
+    top: 200px;
+    right: 120px;
+}
+
+#currentDate {
+    color: white;
+    font-size: 18px;
+    margin: 0 15px;
+}
+
+.macro_graph {
+    background-color: rgba(255, 255, 255, 0.8);;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
+    border: 1.5px solid black;
+    margin-bottom: 10px; 
+}
