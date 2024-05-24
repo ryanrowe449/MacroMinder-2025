@@ -1,11 +1,11 @@
 from app import db
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import ForeignKey, Column, Integer, String, Boolean, Date
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.schema import PrimaryKeyConstraint
+#from sqlalchemy.ext.declarative import declarative_base
+#from sqlalchemy.schema import PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
-Base = declarative_base
+#Base = declarative_base
 
 class User(db.Model):
     # Replace 'User' with the name of your database table containing these exact things - Ori
@@ -23,11 +23,18 @@ class Habits(db.Model):
     habit_description = db.Column(db.String(255), nullable=False)
     is_completed = db.Column(db.Boolean, default=False, nullable=False)
     date = db.Column(db.Date, nullable = False)
-    user = relationship("User", backref="habits")
-    __table_args__ = (
+    sun = db.Column(db.Boolean, default=True, nullable=False)
+    mon = db.Column(db.Boolean, default=True, nullable=False)
+    tues = db.Column(db.Boolean, default=True, nullable=False)
+    wed = db.Column(db.Boolean, default=True, nullable=False)
+    thurs = db.Column(db.Boolean, default=True, nullable=False)
+    fri = db.Column(db.Boolean, default=True, nullable=False)
+    sat = db.Column(db.Boolean, default=True, nullable=False)
+    user = relationship("User", backref="habits") #gets all the habits linked to a user
+    """__table_args__ = (
         PrimaryKeyConstraint('habit_id', 'date'),
         {},
-    )
+    )"""
 
 
 # Db table for tracking the macro for the day, tasks_completed is for habits
@@ -40,7 +47,7 @@ class CompletionLog(db.Model):
     calories = db.Column(db.Integer, default=0)
     tasks_completed = db.Column(db.Integer, default=0)
     weightlbs = db.Column(db.DECIMAL(4, 2), default=150)
-    user = relationship("User", backref="completionlogs")
+    user = relationship("User", backref="completionlogs") #gets all the logs linked to a user
 
 # Db table for keeping life coaches linked with their standard users
 class CoachingGroups(db.Model):

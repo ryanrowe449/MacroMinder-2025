@@ -1,4 +1,4 @@
-from models import Habits
+from models import User, Habits
 from app import db
 import datetime
 from services.TimeService import TimeService
@@ -30,8 +30,31 @@ class HabitService:
         return completed_habits_count
 
     @staticmethod
-    def list_habits(user_id, current_date):
-        habits = Habits.query.filter_by(user_id=user_id, date=current_date).all()
+    def list_habits(user_id, current_date=None):
+        #dictionary to map full day names to their abbreviated forms (database uses the abbreviated forms)
+        day_abbreviations = {
+            'monday': 'mon',
+            'tuesday': 'tues',
+            'wednesday': 'wed',
+            'thursday': 'thurs',
+            'friday': 'fri',
+            'saturday': 'sat',
+            'sunday': 'sun'
+        }
+        if current_date:
+            #convert current_date to a datetime so it can be compared in the query
+            if isinstance(current_date, str):
+                current_date = datetime.strptime(current_date, '%Y-%m-%d')
+            #get the day of the week as a string
+            full_day = current_date.strftime('%A').lower()
+            day = day_abbreviations[full_day]
+            unfiltered_habits = Habits.query.filter(Habits.user_id == user_id, Habits.date <= current_date).all()
+            habits = [habit for habit in unfiltered_habits if getattr(habit, day)]
+        else:
+            #habits = Habits.query.filter_by(user_id=user_id).all()
+            #new way of querying: uses the user relationship (see in models.py)
+            user = User.query.get(user_id)
+            habits = user.habits
         return habits
     
     @staticmethod
@@ -57,7 +80,7 @@ class HabitService:
         return True, new_habit.habit_id
     
     @staticmethod
-    def edit_habit(habit_id, new_description):
+    def edit_habit_desc(habit_id, new_description):
         #set date variable to the date of the habit i wanna edit
         #date = request.form.get('date')
         habit = Habits.query.filter_by(habit_id=habit_id).first()
@@ -69,9 +92,9 @@ class HabitService:
             return False
         
     @staticmethod
-    def delete_habit(habit_id, date):
+    def delete_habit(habit_id):
         # Query the habit using both habit_id and date
-        habit = Habits.query.filter_by(habit_id=habit_id, date=date).first()
+        habit = Habits.query.filter_by(habit_id=habit_id).first()
         if habit:
             db.session.delete(habit)
             db.session.commit()

@@ -11,8 +11,8 @@ from datetime import date, datetime
 import pandas as pd
 import plotly.graph_objects as go
 
-# route for login, it gets the username and password to verify the user
-# this route sets up all session id's and directs the user to the correct dashboard
+#route for login, it gets the username and password to verify the user
+#sets up all session id's and directs the user to the correct dashboard
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -45,12 +45,12 @@ def logout():
     session.clear()  #remove all items from a session
     return redirect(url_for('login'))  #redirect to home page
 
-# Route to render registration page
+#Route to render registration page
 @app.route('/gotoregister', methods=['POST','GET'])
 def goToRegister():
     return render_template('RegisterPage.html')
 
-# this route obtains the information to build a user, calls UserService to create a user
+#this route obtains the information to build a user, calls UserService to create a user
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username')
@@ -77,7 +77,7 @@ def admin_dashboard():
     return render_template('AdminDashboard.html', users=users)
 
 #Admin functionality of the delete portion of crud, new simplified version to make things simpler.
-# this route uses multiple backend Services to delete a user, and all associated records in the db
+#this route uses multiple backend Services to delete a user, and all associated records in the db
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     if session.get('role') != 'Admin':
@@ -154,6 +154,44 @@ def user_dashboard():
     return render_template('UserDashboard.html', habits=habits, current_date=current_date, username=username, life_coaches=life_coaches, connected_coach=connected_coach, graph_html=graph_html,
                            macros_html=macros_html)
 
+@app.route('/managehabits', methods=['POST'])
+def manage_habits():
+    #send the user's habits to managehabits.html
+    userid = session.get('userid')
+    habits = HabitService.list_habits(userid)
+    return render_template('ManageHabits.html', habits=habits, getattr=getattr) #have to add getattr=getattr to the template context so it can be used
+
+@app.route('/updatehabits', methods=['POST'])
+def update_habits():
+    if request.method == 'POST':
+        data = request.json
+        habits = data.get('habits', []) #put the data into a list
+        user_id = session.get('userid')
+
+        if user_id:
+            for habit_data in habits:
+                habit_id = habit_data['habit_id'] #habit_id is the key
+                habit_description = habit_data.get('habit_description')
+                habit = Habits.query.filter_by(habit_id=habit_id, user_id=user_id).first()
+                
+                if habit:
+                    habit.habit_description = habit_description
+                    habit.sun = habit_data.get('sun', False) #defaults to False if a key is missing
+                    habit.mon = habit_data.get('mon', False)
+                    habit.tues = habit_data.get('tues', False)
+                    habit.wed = habit_data.get('wed', False)
+                    habit.thurs = habit_data.get('thurs', False)
+                    habit.fri = habit_data.get('fri', False)
+                    habit.sat = habit_data.get('sat', False)
+
+                    db.session.commit()
+
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'You must be logged in to update habits.'})
+
+    return jsonify({'success': False, 'message': 'Invalid request method.'})
+
 #A route to set a coach, called when a user clicks on an available lifecoach in the dashboard
 #uses Userservice to link a lifecoach and user in the CoachingGroups database table
 @app.route('/set_coach/<int:life_coach_id>', methods=['POST'])
@@ -221,10 +259,8 @@ def editHabit():
 @app.route('/deletehabit', methods=['POST'])
 def deleteHabit():
     habit_id = request.form.get('habit_id')
-    current_date = session.get('current_date')
-    current_date = TimeService.parse_session_date(current_date)
 
-    success = HabitService.delete_habit(habit_id, current_date)
+    success = HabitService.delete_habit(habit_id)
     
     if success:
         return jsonify({'success': True})
@@ -246,7 +282,6 @@ def add_macros():
     new_macro = CompletionLogService.add_completion_log(userid, current_date, protein, calories, 0, weightlbs)
   
     return jsonify({"success": True})
-
 # ----------------------- LIFECOACH ROUTES ---------------------------------------
 
 #the main lifecoach dashbaors, uses Coachingservice to print out all paired users

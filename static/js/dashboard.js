@@ -18,20 +18,24 @@ async function addHabit(event) {
     if (result.success) {
         const habitsList = document.querySelector('.habit-list');
         const newHabitElement = document.createElement('div');
-        newHabitElement.innerHTML = `<form id="habitForm_${result.habit_id}" onchange="checkBox(event, this)">
-                                                <input type="hidden" name="habit_id" value="${result.habit_id}">
-                                                <input type="checkbox" id="habit_${result.habit_id}" name="completed" value="True">
-                                                <label class="habit-description" for="habit_${result.habit_id}">${data.get('habitdesc')}</label>
-                                                <button type="button" onclick="showEditPopup('${result.habit_id}', '${data.get('habitdesc')}')">Edit</button>
-                                                <button type="button" onclick="deleteHabit('${result.habit_id}', event)">Delete</button>
-                                            </form>`;
-        habitsList.appendChild(newHabitElement);
+        newHabitElement.innerHTML = `<input type="hidden" name="habit_id" value="${result.habit_id}">
+            <label class="habit-description" for="habit_${result.habit_id}">${data.get('habitdesc')}</label>
+            <div class="checkbox-container">
+                ${['Daily', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((label, i) => `
+                    <input type="checkbox" id="habit_${result.habit_id}_checkbox_${i}" name="habit_${result.habit_id}_checkbox_${i}" class="day-checkbox" ${i === 0 ? `onclick="dailyCheckbox('${result.habit_id}')"` : ''}>
+                    <label class="day" for="habit_${result.habit_id}_checkbox_${i}">${label}</label>
+                `).join('')}
+            </div>
+            <button type="button" onclick="deleteHabit('${result.habit_id}', event)">Delete</button>
+        `;
+        habitsList.insertBefore(newHabitElement, form);
         form.reset();
     } else {
         alert(result.message);
     }
 }
 
+//function that allows a coach to add a habit to their client's habits
 async function coachAddHabit(event) {
     event.preventDefault();
 
@@ -103,42 +107,55 @@ function checkBox(event, form) {
         });
 }
 
-// Function to show edit popup
-function showEditPopup(habitId, currentDescription) {
-    document.getElementById('editHabitId').value = habitId;
-    document.getElementById('newHabitDescription').value = currentDescription;
-    document.getElementById('editPopup').style.display = 'block';
+//functionality: when the daily checkbox is clicked in ManageHabits.html, the rest get checked
+function toggleCheckboxes(habitId) {
+    var checkboxes = document.querySelectorAll('#habitForm_' + habitId + ' .day-checkbox'); //all day checkboxes
+    var dailyCheckbox = checkboxes[0];
+
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = dailyCheckbox.checked;
+    });
 }
 
-// Function to close edit popup
-function closeEditPopup() {
-    document.getElementById('editPopup').style.display = 'none';
+//functionality: when all checkboxes are clicked, the daily checkbox gets checked
+function updateDailyCheckbox(habitId) {
+    var checkboxes = document.querySelectorAll('#habitForm_' + habitId + ' .day-checkbox');
+    var dailyCheckbox = checkboxes[0];
+    let allChecked = true;
+
+    //skip the first checkbox (dailyCheckbox) and check the others
+    for (let i = 1; i < checkboxes.length; i++) {
+        if (!checkboxes[i].checked) {
+            allChecked = false;
+            break;
+        }
+    }
+
+    dailyCheckbox.checked = allChecked;
 }
 
-// Function to submit edited habit
-function submitEdit(event) {
-    event.preventDefault();
-    const form = document.getElementById('editForm');
-    const formData = new FormData(form);
-    formData.append('date', getCurrentDateString()); // Append the date to the form data
-    fetch('/edithabit', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Habit updated');
-                document.querySelector(`label[for='habit_${form.elements['habit_id'].value}']`).textContent = form.elements['new_description'].value;
-                closeEditPopup();
-            } else {
-                alert('Failed to update habit');
-            }
-            form.reset();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+//function to make a label editable, used for the habits in ManageHabits.html
+function makeEditable(label) {
+    const input = label.nextElementSibling; //gets the input field
+    input.value = label.textContent; //puts the text of the label into the input
+    label.style.display = 'none'; //hides label
+    input.style.display = 'inline-block'; //makes the input field visible
+    input.focus(); //puts user's cursor in the input field
+}
+
+//function to save the text a user has entered when they click outside of the input field
+function saveText(input) {
+    const label = input.previousElementSibling;
+    label.textContent = input.value;
+    input.style.display = 'none';
+    label.style.display = 'inline-block';
+}
+
+//when enter is clicked after editing a habit description, switches back to the label
+function handleKeyPress(event, input) {
+    if (event.key === 'Enter') {
+        input.blur();
+    }
 }
 
 // Function to delete a habit
@@ -166,6 +183,44 @@ function deleteHabit(habitId, event) {
         .catch(error => {
             console.error('Error:', error);
         });
+}
+
+//function to apply the changes a user has made to habits
+async function applyChanges() {
+    const forms = document.querySelectorAll('.habit-list form[id^="habitForm_"]'); //gets each individual habit form
+    const changes = [];
+
+    forms.forEach(form => {
+        const habitId = form.querySelector('input[name="habit_id"]').value;
+        const habitDescription = form.querySelector('.habit-description').textContent;
+        const checkboxes = form.querySelectorAll('.day-checkbox');
+        const days = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'];
+        const habitData = { habit_id: habitId, habit_description: habitDescription };
+
+        checkboxes.forEach((checkbox, index) => {
+            if (index > 0) { //skip 'daily' checkbox
+                habitData[days[index - 1]] = checkbox.checked; //store whether or not each checkbox is checked
+            }
+        });
+
+        changes.push(habitData);
+    });
+
+    //organize data into JSON array and send to /updatehabits
+    const response = await fetch('/updatehabits', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ habits: changes })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        alert('Changes applied successfully!');
+    } else {
+        alert('Failed to apply changes.');
+    }
 }
 
 function previousDate() {

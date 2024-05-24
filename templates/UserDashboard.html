@@ -39,13 +39,13 @@
                                     <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
                                     <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {{ 'checked' if habit.is_completed else '' }}>
                                     <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
-                                    <button type="button" onclick="showEditPopup('{{ habit.habit_id }}', '{{ habit.habit_description }}')">Edit</button>
-                                    <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>
+                                    <!--<button type="button" onclick="showEditPopup('{{ habit.habit_id }}', '{{ habit.habit_description }}')">Edit</button>
+                                    <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>-->
                                 </form>
                             {% endfor %}
                         </div>
                         <!--edit popup; initially hidden (display: none) until the edit button is clicked-->
-                        <div id="editPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #ccc; padding: 20px; z-index: 2;">
+                        <!--<div id="editPopup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #ccc; padding: 20px; z-index: 2;">
                             <form id="editForm" onsubmit="submitEdit(event)">
                                 <input type="hidden" id="editHabitId" name="habit_id">
                                 <label for="newHabitDescription">New Description:</label>
@@ -53,12 +53,16 @@
                                 <button type="submit">Submit</button>
                                 <button type="button" onclick="closeEditPopup()">Cancel</button>
                             </form>
-                        </div>
+                        </div>-->
                         <canvas id="barChart"></canvas>
                         <!--button for adding a habit-->
-                        <form id="add-habit-form" method="POST" onsubmit="addHabit(event)">
+                        <!--<form id="add-habit-form" method="POST" onsubmit="addHabit(event)">
                             <input type="text" id="habitdesc" name="habitdesc" required>
                             <button type="submit" class="btn btn-primary">Add Habit</button>
+                        </form>-->
+                        <!--button for managing habits-->
+                        <form id="manage-habit-form" method="POST" action="/managehabits">
+                            <button type="submit" class="btn btn-primary">Manage Habits</button>
                         </form>
                     </div>
                     <div>

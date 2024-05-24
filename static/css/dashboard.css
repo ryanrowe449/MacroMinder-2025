@@ -106,6 +106,10 @@ h1 {
     color: black;
 }
 
+.day {
+    color: black;
+}
+
 /* Logout Button */
 .logout-button {
     position: absolute;
