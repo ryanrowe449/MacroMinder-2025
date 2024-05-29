@@ -46,6 +46,8 @@
                 </form>
             {% endfor %}
             <form id="add-habit-form" method="POST" onsubmit="addHabit(event)">
+                <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
+                <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
                 <input type="text" id="habitdesc" name="habitdesc" required>
                 <button type="submit" class="btn btn-primary">Add Habit</button>
             </form>

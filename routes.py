@@ -151,15 +151,16 @@ def user_dashboard():
 
     habits = HabitService.list_habits(userid, current_date) #add date parameter
 
-    return render_template('UserDashboard.html', habits=habits, current_date=current_date, username=username, life_coaches=life_coaches, connected_coach=connected_coach, graph_html=graph_html,
+    return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date, username=username, life_coaches=life_coaches, connected_coach=connected_coach, graph_html=graph_html,
                            macros_html=macros_html)
+
 
 @app.route('/managehabits', methods=['POST'])
 def manage_habits():
     #send the user's habits to managehabits.html
-    userid = session.get('userid')
+    userid = request.form.get('user_id')
     habits = HabitService.list_habits(userid)
-    return render_template('ManageHabits.html', habits=habits, getattr=getattr) #have to add getattr=getattr to the template context so it can be used
+    return render_template('ManageHabits.html', userid=userid, habits=habits, getattr=getattr) #have to add getattr=getattr to the template context so it can be used
 
 @app.route('/updatehabits', methods=['POST'])
 def update_habits():
@@ -215,7 +216,8 @@ def set_coach(life_coach_id):
 def addHabit():
     if request.method == 'POST':
         description = request.form.get('habitdesc')
-        userid = session.get('userid') 
+        #userid = session.get('userid')
+        userid = request.form.get('user_id') 
         current_date = session.get('current_date')
         current_date = TimeService.parse_session_date(current_date)
 
@@ -327,25 +329,6 @@ def view_user(user_id):
 
     # Render the UserView.html template with the user's information
     return render_template('UserView.html', user=user, user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, graph_html=graph_html, macros_html=macros_html)
-
-#Lifecoaches version of add habit, gets the users id to add the habit through HabitService
-@app.route('/coachAddHabit', methods=['POST'])
-def coachAddHabit():
-    if request.method == 'POST':
-        data = request.json  # Parse JSON data from request
-        description = data.get('habitdesc')
-        user_id = request.json.get('user_id')
-        current_date = session.get('current_date')
-        current_date = TimeService.parse_session_date(current_date)
-
-        if user_id:
-            success, response = HabitService.add_habit(user_id, description, current_date)
-            if success:
-                return jsonify({'success': True, 'habit_id': response})
-            else:
-                return jsonify({'success': False, 'message': response})
-        else:
-            return jsonify({'success': False, 'message': 'User ID not provided.'})
 
 #coaches log macros, essentially the same as users but takes in the users ID so that it is added for them not the coach
 @app.route('/coach/logmacros', methods=['POST'])
