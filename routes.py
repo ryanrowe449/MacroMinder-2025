@@ -37,6 +37,17 @@ def login():
 
     return render_template('LoginPage.html')
 
+#when clicking the back button in ManageHabits.html, loads the user/lifecoach dashboard
+@app.route('/managehabits_back', methods=['POST'])
+def back():
+    role = session.get('role')
+    user_id = request.form.get('user_id')
+    #if the logged-in user is a life coach, go back to the page of their client. If not, load the User's page
+    if role == 'LifeCoach':
+        return redirect(url_for('view_user', user_id=user_id))
+    elif role == 'User':
+        return redirect(url_for('user_dashboard'))
+
 #route to log out of current account
 #Explaining the use of session here, it is a feature provided by flask that
 #essentially saves the 'current' users information to persist through multiple requests
@@ -167,7 +178,7 @@ def update_habits():
     if request.method == 'POST':
         data = request.json
         habits = data.get('habits', []) #put the data into a list
-        user_id = session.get('userid')
+        user_id = data.get('user_id')
 
         if user_id:
             for habit_data in habits:
@@ -307,10 +318,6 @@ def lifecoach_dashboard():
 #everything there applies here.
 @app.route('/viewuser/<int:user_id>', methods=['GET'])
 def view_user(user_id):
-    # Check if the user is logged in
-    #if 'userid' not in session:
-    #    return redirect(url_for('login'))
-    # Retrieve the user from the database
     user = User.query.get(user_id)
     user_username = user.username
     session_date = session.get('current_date')

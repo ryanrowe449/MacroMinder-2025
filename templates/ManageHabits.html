@@ -12,7 +12,10 @@
 </head>
 <body id="managementPage">
     <div id="header-bar">
-        <button onclick="window.history.back();" style="position:absolute; top:20px; left:20px;">Back</button>
+        <form id="go-back-form" method="POST" action="/managehabits_back">
+            <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+            <button type="submit" style="position:absolute; top:20px; left:20px;">Back</button>
+        </form>
         <h1>Macrominder</h1>
     </div>
     <div class="bg-white tm-block h-100">

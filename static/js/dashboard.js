@@ -22,7 +22,7 @@ async function addHabit(event) {
             <label class="habit-description" for="habit_${result.habit_id}">${data.get('habitdesc')}</label>
             <div class="checkbox-container">
                 ${['Daily', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((label, i) => `
-                    <input type="checkbox" id="habit_${result.habit_id}_checkbox_${i}" name="habit_${result.habit_id}_checkbox_${i}" class="day-checkbox" ${i === 0 ? `onclick="dailyCheckbox('${result.habit_id}')"` : ''}>
+                    <input type="checkbox" id="habit_${result.habit_id}_checkbox_${i}" name="habit_${result.habit_id}_checkbox_${i}" class="day-checkbox" ${i === 0 ? `onclick="dailyCheckbox('${result.habit_id}')"` : ''} checked>
                     <label class="day" for="habit_${result.habit_id}_checkbox_${i}">${label}</label>
                 `).join('')}
             </div>
@@ -30,6 +30,7 @@ async function addHabit(event) {
         `;
         habitsList.insertBefore(newHabitElement, form);
         form.reset();
+        location.reload();
     } else {
         alert(result.message);
     }
@@ -189,13 +190,15 @@ function deleteHabit(habitId, event) {
 async function applyChanges() {
     const forms = document.querySelectorAll('.habit-list form[id^="habitForm_"]'); //gets each individual habit form
     const changes = [];
+    const userId = document.getElementById('user_id').value;
 
     forms.forEach(form => {
         const habitId = form.querySelector('input[name="habit_id"]').value;
         const habitDescription = form.querySelector('.habit-description').textContent;
+        
         const checkboxes = form.querySelectorAll('.day-checkbox');
         const days = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'];
-        const habitData = { habit_id: habitId, habit_description: habitDescription };
+        const habitData = { habit_id: habitId, habit_description: habitDescription};
 
         checkboxes.forEach((checkbox, index) => {
             if (index > 0) { //skip 'daily' checkbox
@@ -206,20 +209,27 @@ async function applyChanges() {
         changes.push(habitData);
     });
 
+    //restructuring data to include userId
+    const payload = {
+        user_id: userId,
+        habits: changes
+    };
+
     //organize data into JSON array and send to /updatehabits
     const response = await fetch('/updatehabits', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ habits: changes })
+        body: JSON.stringify(payload)
     });
-
+    
     const result = await response.json();
+    
     if (result.success) {
         alert('Changes applied successfully!');
     } else {
-        alert('Failed to apply changes.');
+        alert('Failed to apply changes: ' + result.message);
     }
 }
 
