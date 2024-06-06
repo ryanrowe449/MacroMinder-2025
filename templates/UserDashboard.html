@@ -36,6 +36,7 @@
                         <div class="habit-list">
                             {% for habit in habits %}
                                 <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
+                                    <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
                                     <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
                                     <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
                                     <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>

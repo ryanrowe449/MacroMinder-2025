@@ -249,10 +249,10 @@ def addHabit():
         else:
             return jsonify({'success': False, 'message': 'You must be logged in to add a habit.'})
 
-#called when a checkbox is clicked, sets the database variable is_completed to true or false
+#called when a checkbox is clicked, stores/deletes a completion in habitcompletion
 @app.route('/checkbox', methods=['POST'])
 def checkBox():
-    user_id = session.get('userid')
+    user_id = request.form.get('user_id')
     habit_id = request.form.get('habit_id')
     current_date = session.get('current_date')
     current_date = TimeService.parse_session_date(current_date)
@@ -263,8 +263,7 @@ def checkBox():
 
         if completed:
             if not habit_completion:
-                habit_completion = HabitCompletion(habit_id=habit_id, user_id=user_id, date=current_date)
-                db.session.add(habit_completion)
+                HabitCompletionService.add_completion(habit_id, user_id, current_date)
         else:
             if habit_completion:
                 db.session.delete(habit_completion)
@@ -290,10 +289,11 @@ def editHabit():
 #called when a user clicks delete habit, passes info to HabitService
 @app.route('/deletehabit', methods=['POST'])
 def deleteHabit():
+    #before deleting the habit, delete the completions related to the habit
+    #have to delete completions before deleting habit, as delete_habit_completions requires that the habit exists
     habit_id = request.form.get('habit_id')
-
+    HabitCompletionService.delete_habit_completions(habit_id)
     success = HabitService.delete_habit(habit_id)
-    
     if success:
         return jsonify({'success': True})
     else:
@@ -348,13 +348,15 @@ def view_user(user_id):
     
     habits = HabitService.list_habits(user_id, current_date)
     
-    graph_html = GraphService.generate_habit_progress_graph(current_date, user_id)
+    #graph_html = GraphService.generate_habit_progress_graph(current_date, user_id)
 
     # Generate weight over time graph HTML
-    macros_html = GraphService.generate_weight_over_time_graph(user_id)
+    #macros_html = GraphService.generate_weight_over_time_graph(user_id)
+    completions = HabitCompletionService.get_completions(user_id, current_date)
+    completions_dict = {completion.habit_id: True for completion in completions}
 
     # Render the UserView.html template with the user's information
-    return render_template('UserView.html', user=user, user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, graph_html=graph_html, macros_html=macros_html)
+    return render_template('UserView.html', user=user, user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, completions=completions_dict)
 
 #coaches log macros, essentially the same as users but takes in the users ID so that it is added for them not the coach
 @app.route('/coach/logmacros', methods=['POST'])
