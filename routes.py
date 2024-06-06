@@ -1,9 +1,10 @@
 from flask import render_template, request, flash, session, redirect, url_for, jsonify
 from app import app, db, bcrypt
-from models import User, Habits, CompletionLog, CoachingGroups
+from models import User, Habits, CompletionLog, CoachingGroups, HabitCompletion
 from services.UserService import UserService
 from services.HabitService import HabitService
 from services.CompletionLogService import CompletionLogService
+from services.HabitCompletionService import HabitCompletionService
 from services.TimeService import TimeService
 from services.CoachingService import CoachingService
 from services.GraphService import GraphService
@@ -157,13 +158,19 @@ def user_dashboard():
             break 
 
     #use graphservice to create the 2 graphs printed on the dashboard
-    graph_html = GraphService.generate_habit_progress_graph(current_date, userid)
-    macros_html = GraphService.generate_weight_over_time_graph(userid)
+    #graph_html = GraphService.generate_habit_progress_graph(current_date, userid)
+    #macros_html = GraphService.generate_weight_over_time_graph(userid)
 
     habits = HabitService.list_habits(userid, current_date) #add date parameter
+    completions = HabitCompletionService.get_completions(userid, current_date)
+    completions_dict = {completion.habit_id: True for completion in completions}
 
-    return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date, username=username, life_coaches=life_coaches, connected_coach=connected_coach, graph_html=graph_html,
-                           macros_html=macros_html)
+    """return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
+                           username=username, life_coaches=life_coaches, connected_coach=connected_coach,
+                           graph_html=graph_html, macros_html=macros_html, completions=completions_dict)"""
+    return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
+                           username=username, life_coaches=life_coaches, connected_coach=connected_coach,
+                           completions=completions_dict)
 
 
 @app.route('/managehabits', methods=['POST'])
@@ -173,6 +180,7 @@ def manage_habits():
     habits = HabitService.list_habits(userid)
     return render_template('ManageHabits.html', userid=userid, habits=habits, getattr=getattr) #have to add getattr=getattr to the template context so it can be used
 
+#just used for the managehabits page; this handles the event of a user changing the description/days of a habit
 @app.route('/updatehabits', methods=['POST'])
 def update_habits():
     if request.method == 'POST':
@@ -244,13 +252,24 @@ def addHabit():
 #called when a checkbox is clicked, sets the database variable is_completed to true or false
 @app.route('/checkbox', methods=['POST'])
 def checkBox():
+    user_id = session.get('userid')
     habit_id = request.form.get('habit_id')
     current_date = session.get('current_date')
     current_date = TimeService.parse_session_date(current_date)
     completed = request.form.get('completed')=='True'
     habit = HabitService.get_habit(habit_id)
     if habit:
-        HabitService.mark_completed(habit, completed)
+        habit_completion = HabitCompletion.query.filter_by(habit_id=habit_id, user_id=user_id, date=current_date).first()
+
+        if completed:
+            if not habit_completion:
+                habit_completion = HabitCompletion(habit_id=habit_id, user_id=user_id, date=current_date)
+                db.session.add(habit_completion)
+        else:
+            if habit_completion:
+                db.session.delete(habit_completion)
+
+        db.session.commit()
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'message': 'Habit not found'})

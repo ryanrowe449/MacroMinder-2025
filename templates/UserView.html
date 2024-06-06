@@ -40,7 +40,7 @@
                             {% for habit in habits %}
                             <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
                                 <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
-                                <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {{ 'checked' if habit.is_completed else '' }}>
+                                <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
                                 <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
                                 <!--<button type="button" onclick="showEditPopup('{{ habit.habit_id }}', '{{ habit.habit_description }}')">Edit</button>
                                 <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>-->

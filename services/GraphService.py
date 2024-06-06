@@ -1,13 +1,15 @@
 import plotly.graph_objects as go
 from services.HabitService import HabitService
 from services.CompletionLogService import CompletionLogService
+from services.HabitCompletionService import HabitCompletionService
 
 class GraphService:
 
     @staticmethod
     def generate_habit_progress_graph(current_date, user_id):
         total_habits = HabitService.count_total_habits_for_user(current_date, user_id)
-        completed_habits = HabitService.count_completed_habits_for_user(current_date, user_id)
+        #completed_habits = HabitService.count_completed_habits_for_user(current_date, user_id)
+        completed_habits = HabitCompletionService.get_completions(user_id, current_date)
 
         fig = go.Figure()
         fig.add_trace(go.Bar(

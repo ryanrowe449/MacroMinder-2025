@@ -21,7 +21,6 @@ class Habits(db.Model):
     habit_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
     habit_description = db.Column(db.String(255), nullable=False)
-    is_completed = db.Column(db.Boolean, default=False, nullable=False)
     date = db.Column(db.Date, nullable = False)
     sun = db.Column(db.Boolean, default=True, nullable=False)
     mon = db.Column(db.Boolean, default=True, nullable=False)
@@ -31,10 +30,6 @@ class Habits(db.Model):
     fri = db.Column(db.Boolean, default=True, nullable=False)
     sat = db.Column(db.Boolean, default=True, nullable=False)
     user = relationship("User", backref="habits") #gets all the habits linked to a user
-    """__table_args__ = (
-        PrimaryKeyConstraint('habit_id', 'date'),
-        {},
-    )"""
 
 
 # Db table for tracking the macro for the day, tasks_completed is for habits
@@ -48,6 +43,15 @@ class CompletionLog(db.Model):
     tasks_completed = db.Column(db.Integer, default=0)
     weightlbs = db.Column(db.DECIMAL(4, 2), default=150)
     user = relationship("User", backref="completionlogs") #gets all the logs linked to a user
+
+class HabitCompletion(db.Model):
+    __tablename__ = 'HabitCompletion'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    habit_id = db.Column(db.Integer, db.ForeignKey('Habits.habit_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    habit = relationship("Habits", backref="completions") #gets all completions linked to a habit
+    user = relationship("User", backref="habit_completions") #gets all completions linked to a user
 
 # Db table for keeping life coaches linked with their standard users
 class CoachingGroups(db.Model):

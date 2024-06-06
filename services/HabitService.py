@@ -23,11 +23,6 @@ class HabitService:
     def count_total_habits_for_user(current_date, user_id):
         total_habit_count = Habits.query.filter_by(date=current_date, user_id=user_id).count()
         return total_habit_count
-    
-    @staticmethod
-    def count_completed_habits_for_user(current_date, user_id):
-        completed_habits_count = Habits.query.filter_by(date=current_date, is_completed=True, user_id=user_id).count()
-        return completed_habits_count
 
     @staticmethod
     def list_habits(user_id, current_date=None):
@@ -61,11 +56,6 @@ class HabitService:
     def get_habit(habit_id):
         habit = Habits.query.filter_by(habit_id = habit_id).first()
         return habit
-    
-    @staticmethod
-    def mark_completed(habit, completed):
-        habit.is_completed = completed
-        db.session.commit()
 
     @staticmethod
     def add_habit(user_id, description, current_date):
