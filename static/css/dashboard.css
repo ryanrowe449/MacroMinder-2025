@@ -67,7 +67,7 @@ h1 {
 
 .extended-col {
     flex: 1 1 auto;
-    max-width: 1000px;
+    max-width: 500px;
     margin-left: 20px;
 }
 
@@ -108,13 +108,6 @@ h1 {
 
 .day {
     color: black;
-}
-
-/* Logout Button */
-.logout-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
 }
 
 /* Adjust text color */
@@ -182,4 +175,78 @@ h1 {
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
     border: 1.5px solid black;
     margin-bottom: 10px; 
+}
+/*styling for the sliding menu*/
+.menu {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.menu a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.menu a:hover {
+    color: #f1f1f1;
+}
+
+.menu .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.openbtn:hover {
+    background-color: #444;
+}
+
+/*graph container, allows graphs to be displayed on the same row*/
+.graph-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px; /* Optional: adds space between graphs */
+}
+
+.graph-container .bg-white {
+    flex: 1 1 45%; /* Adjusts the width of each graph, making them fit side by side */
+    max-width: 45%;
+}
+
+.graph-col {
+    flex: 1;
+    max-width: calc(50% - 20px); /* Ensure columns fit within the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.main-content {
+    transition: margin-left 0.5s;
+    padding: 16px;
 }

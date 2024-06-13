@@ -305,3 +305,16 @@ function getCurrentDateString() {
     const day = currentDate.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+
+//function used to open and close the sliding menu
+function toggleMenu() {
+    var menu = document.getElementById("myMenu");
+    var mainContent = document.getElementById("home");
+    if (menu.style.width === "0px" || menu.style.width === "") {
+        menu.style.width = "250px";
+        mainContent.style.marginLeft = "250px";
+    } else {
+        menu.style.width = "0";
+        mainContent.style.marginLeft = "0";
+    }
+}

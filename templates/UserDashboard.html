@@ -12,18 +12,24 @@
 </head>
 <body id="reportsPage">
     <div id="header-bar">
+        <button class="openbtn" onclick="toggleMenu()">☰ Menu</button>
         <h1>Macrominder</h1>
+    </div>
+    <!--sliding menu-->
+    <div id="myMenu" class="menu">
+        <!--the links are clickable, so javascript:void(0) makes the link do nothing when clicked,
+        allowing toggleMenu to replace its normal behavior. &times creates an 'x' symbol-->
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+        <a href="/load_graph_page?user_id={{userid}}">Graphs</a>
+        <a href="#">Charts</a>
+        <form action="/signout" method="GET, POST">
+            <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
     </div>
     <div id="tm-col tm-col-big" style="text-align: center;">
         <button onclick="previousDate()">◀</button>
         <span id="currentDate" style="display: inline-block;">{{ current_date }}</span>
         <button onclick="nextDate()">▶</button>
-    </div>
-    <!--logout button-->
-    <div class="logout-button">
-        <form action="/signout" method="GET, POST">
-            <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
     </div>
     <div class="" id="home">
         <div class="container">

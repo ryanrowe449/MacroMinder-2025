@@ -67,17 +67,41 @@ class CompletionLogService:
             return False
         
     @staticmethod
-    def fetch_macros_for_current_user(user_id):
+    def get_macros_for_current_user(user_id):
         macros = CompletionLog.query.filter_by(user_id=user_id).all()
         return macros
     
     @staticmethod
-    def fetch_weight_data(user_id):
-        # Fetch weight and date data from CompletionLog table for the given user_id
+    def get_weight_data(user_id):
+        #Fetch weight and date data from CompletionLog table for the given user_id
         logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        data = {}
+        #extract dates and weights from the logs, store in data dictionary
+        for log in logs:
+            data[log.date] = log.weightlbs
 
-        # Extract dates and weights from the logs
-        dates = [log.date for log in logs]
-        weights = [log.weightlbs for log in logs]
+        #split data into two lists, one containing dates (sorted), the other weights
+        dates = sorted(data.keys())
+        weights = [data[date] for date in dates]
 
         return dates, weights
+    
+    @staticmethod
+    def get_calories_data(user_id):
+        logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        data = {}
+        for log in logs:
+            data[log.date] = log.calories
+        dates = sorted(data.keys())
+        calories = [data[date] for date in dates]
+        return dates, calories
+    
+    @staticmethod
+    def get_protein_data(user_id):
+        logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        data = {}
+        for log in logs:
+            data[log.date] = log.protein
+        dates = sorted(data.keys())
+        protein = [data[date] for date in dates]
+        return dates, protein

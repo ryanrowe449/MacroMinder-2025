@@ -48,6 +48,15 @@ def back():
         return redirect(url_for('view_user', user_id=user_id))
     elif role == 'User':
         return redirect(url_for('user_dashboard'))
+    
+@app.route('/load_graph_page')
+def load_graph_page():
+    user_id = request.args.get('user_id')
+    weight_graph = GraphService.generate_weight_over_time_graph(user_id)
+    completions_graph = GraphService.generate_completions_over_time_graph(user_id)
+    calories_graph = GraphService.generate_calories_over_time_graph(user_id)
+    protein_graph = GraphService.generate_protein_over_time_graph(user_id)
+    return render_template('Graphs.html', user_id=user_id, weight_graph=weight_graph, completions_graph=completions_graph, calories_graph=calories_graph, protein_graph=protein_graph)
 
 #route to log out of current account
 #Explaining the use of session here, it is a feature provided by flask that
@@ -164,10 +173,7 @@ def user_dashboard():
     habits = HabitService.list_habits(userid, current_date) #add date parameter
     completions = HabitCompletionService.get_completions(userid, current_date)
     completions_dict = {completion.habit_id: True for completion in completions}
-
-    """return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
-                           username=username, life_coaches=life_coaches, connected_coach=connected_coach,
-                           graph_html=graph_html, macros_html=macros_html, completions=completions_dict)"""
+    
     return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
                            username=username, life_coaches=life_coaches, connected_coach=connected_coach,
                            completions=completions_dict)

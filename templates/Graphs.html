@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Copperplate+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="dashboard.css">
+
+</head>
+<body id="managementPage">
+    <div id="header-bar">
+        <form id="go-back-form" method="POST" action="/managehabits_back">
+            <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+            <button type="submit" style="position:absolute; top:20px; left:20px;">Back</button>
+        </form>
+        <h1>Macrominder</h1>
+    </div>
+    <div class="bg-white">
+        <h2 class="tm-block-title">Graphs</h2>
+        <!--first row-->
+        <div class="graph-container">
+            <div class="bg-white">
+                {{ weight_graph | safe }}
+            </div>
+            <div class="bg-white">
+                {{ completions_graph | safe }}
+            </div>
+        </div>
+        <!--second row-->
+        <div class="graph-container">
+            <div class="bg-white">
+                {{ calories_graph | safe }}
+            </div>
+            <div class="bg-white">
+                {{ protein_graph | safe }}
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>

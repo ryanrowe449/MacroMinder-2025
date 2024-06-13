@@ -30,3 +30,23 @@ class HabitCompletionService:
             for completion in completions:
                 db.session.delete(completion)
             db.session.commit()
+
+    #fetch the number of habits completed for each day and the dates associated
+    @staticmethod
+    def get_completion_data(user_id):
+        user = User.query.get(user_id)
+        data = {} #data is a dictionary that will have key-value pairs of date:habits completed on that date
+        if user:
+            completions = user.habit_completions
+            #loop through completions; if a completion is stored, increase the count; if not, create a new entry
+            for completion in completions:
+                date = completion.date
+                if date in data:
+                    data[date] += 1
+                else:
+                    data[date] = 1
+            #split data into two lists, one containing dates (sorted), the other num of completions
+            dates = sorted(data.keys())
+            count = [data[date] for date in dates]
+            return dates, count
+        return [], [] #return nothing if the user doesn't exist
