@@ -17,6 +17,8 @@
     </div>
     <!--sliding menu-->
     <div id="myMenu" class="menu">
+        <!--the links are clickable, so javascript:void(0) makes the link do nothing when clicked,
+        allowing toggleMenu to replace its normal behavior. &times creates an 'x' symbol-->
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
         <a href="/go_home">Dashboard</a>
         <a href="/load_graphs_page?user_id={{userid}}">Graphs</a>
@@ -26,23 +28,14 @@
         </form>
     </div>
     <div class="bg-white">
-        <h2 class="tm-block-title">Graphs</h2>
+        <h2 class="tm-block-title">Charts</h2>
         <!--first row-->
         <div class="graph-container">
             <div class="bg-white">
-                {{ weight_graph | safe }}
+                {{ habits_barchart | safe }}
             </div>
             <div class="bg-white">
-                {{ completions_graph | safe }}
-            </div>
-        </div>
-        <!--second row-->
-        <div class="graph-container">
-            <div class="bg-white">
-                {{ calories_graph | safe }}
-            </div>
-            <div class="bg-white">
-                {{ protein_graph | safe }}
+                {{ habits_piechart | safe }}
             </div>
         </div>
     </div>

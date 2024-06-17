@@ -39,24 +39,31 @@ def login():
     return render_template('LoginPage.html')
 
 #when clicking the back button in ManageHabits.html, loads the user/lifecoach dashboard
-@app.route('/managehabits_back', methods=['POST'])
-def back():
+@app.route('/go_home', methods=['GET', 'POST'])
+def go_home():
     role = session.get('role')
-    user_id = request.form.get('user_id')
     #if the logged-in user is a life coach, go back to the page of their client. If not, load the User's page
     if role == 'LifeCoach':
+        user_id = request.form.get('user_id')
         return redirect(url_for('view_user', user_id=user_id))
     elif role == 'User':
         return redirect(url_for('user_dashboard'))
     
-@app.route('/load_graph_page')
-def load_graph_page():
+@app.route('/load_graphs_page')
+def load_graphs_page():
     user_id = request.args.get('user_id')
     weight_graph = GraphService.generate_weight_over_time_graph(user_id)
     completions_graph = GraphService.generate_completions_over_time_graph(user_id)
     calories_graph = GraphService.generate_calories_over_time_graph(user_id)
     protein_graph = GraphService.generate_protein_over_time_graph(user_id)
     return render_template('Graphs.html', user_id=user_id, weight_graph=weight_graph, completions_graph=completions_graph, calories_graph=calories_graph, protein_graph=protein_graph)
+
+@app.route('/load_charts_page')
+def load_charts_page():
+    user_id = request.args.get('user_id')
+    habits_barchart = GraphService.generate_habit_progress_barchart(user_id)
+    habits_piechart = GraphService.generate_habit_progress_piechart(user_id)
+    return render_template('Charts.html', habits_barchart=habits_barchart, habits_piechart=habits_piechart)
 
 #route to log out of current account
 #Explaining the use of session here, it is a feature provided by flask that

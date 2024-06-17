@@ -46,8 +46,6 @@ class HabitService:
             unfiltered_habits = Habits.query.filter(Habits.user_id == user_id, Habits.date <= current_date).all()
             habits = [habit for habit in unfiltered_habits if getattr(habit, day)]
         else:
-            #habits = Habits.query.filter_by(user_id=user_id).all()
-            #new way of querying: uses the user relationship (see in models.py)
             user = User.query.get(user_id)
             habits = user.habits
         return habits

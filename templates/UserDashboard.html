@@ -20,8 +20,9 @@
         <!--the links are clickable, so javascript:void(0) makes the link do nothing when clicked,
         allowing toggleMenu to replace its normal behavior. &times creates an 'x' symbol-->
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
-        <a href="/load_graph_page?user_id={{userid}}">Graphs</a>
-        <a href="#">Charts</a>
+        <a href="/go_home">Dashboard</a>
+        <a href="/load_graphs_page?user_id={{userid}}">Graphs</a>
+        <a href="/load_charts_page?user_id={{userid}}">Charts</a>
         <form action="/signout" method="GET, POST">
             <button type="submit" class="btn btn-primary">Logout</button>
         </form>

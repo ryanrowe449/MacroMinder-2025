@@ -4,29 +4,43 @@ from services.CompletionLogService import CompletionLogService
 from services.HabitCompletionService import HabitCompletionService
 
 class GraphService:
-
+    #bar chart: x-axis = each habit, y-axis = number of completions for that habit
     @staticmethod
-    def generate_habit_progress_graph(current_date, user_id):
-        total_habits = HabitService.count_total_habits_for_user(current_date, user_id)
-        #completed_habits = HabitService.count_completed_habits_for_user(current_date, user_id)
-        completed_habits = HabitCompletionService.get_completions(user_id, current_date)
-
+    def generate_habit_progress_barchart(user_id):
+        #gets a user's completions
+        descriptions, count = HabitCompletionService.get_completion_data(user_id)
+        
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            x=['Completed Habits'],
-            y=[completed_habits],
-            name='Completed',
-            marker_color='rgb(55, 83, 109)'
+            x=descriptions,
+            y=count,
+            name='Habit Progress',
+            marker_color='blue'
         ))
 
         fig.update_layout(
             title='Habit Progress',
-            xaxis=dict(title=''),
-            yaxis=dict(title='Total Habits for Today', range=[0, total_habits])
+            xaxis=dict(title='Habits'),
+            yaxis=dict(title='Total Completions'),
         )
 
-        graph_html = fig.to_html(full_html=False)
-        return graph_html
+        chart_html = fig.to_html(full_html=False)
+        return chart_html
+    #same data as bar chart, but a pie chart
+    @staticmethod
+    def generate_habit_progress_piechart(user_id):
+        descriptions, count = HabitCompletionService.get_completion_data(user_id)
+        fig = go.Figure()
+        fig.add_trace(go.Pie(
+            labels=descriptions,
+            values=count,
+            name='Habit Progress',
+        ))
+        fig.update_layout(
+            title='Habit Progress',
+        )
+        chart_html = fig.to_html(full_html=False)
+        return chart_html
 
     @staticmethod
     def generate_weight_over_time_graph(user_id):
@@ -48,7 +62,7 @@ class GraphService:
     
     @staticmethod
     def generate_completions_over_time_graph(user_id):
-        dates, count = HabitCompletionService.get_completion_data(user_id)
+        dates, count = HabitCompletionService.get_completion_date_data(user_id)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=count, mode='lines', name='Habit Completion Count'))
 

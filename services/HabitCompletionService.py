@@ -1,4 +1,5 @@
 from models import HabitCompletion, User, Habits
+from services.HabitService import HabitService
 from app import db
 
 class HabitCompletionService:
@@ -10,8 +11,11 @@ class HabitCompletionService:
     
     #gets a user's completions for the day
     @staticmethod
-    def get_completions(user_id, date):
-        completions = HabitCompletion.query.filter_by(user_id=user_id, date=date).all()
+    def get_completions(user_id, date=None):
+        if date:
+            completions = HabitCompletion.query.filter_by(user_id=user_id, date=date).all()
+        else:
+            completions = HabitCompletion.query.filter_by(user_id=user_id).all()
         return completions
     
     @staticmethod
@@ -33,7 +37,7 @@ class HabitCompletionService:
 
     #fetch the number of habits completed for each day and the dates associated
     @staticmethod
-    def get_completion_data(user_id):
+    def get_completion_date_data(user_id):
         user = User.query.get(user_id)
         data = {} #data is a dictionary that will have key-value pairs of date:habits completed on that date
         if user:
@@ -49,4 +53,29 @@ class HabitCompletionService:
             dates = sorted(data.keys())
             count = [data[date] for date in dates]
             return dates, count
+        return [], [] #return nothing if the user doesn't exist
+    
+    #fetch the number of completions associated with each habit for a user
+    @staticmethod
+    def get_completion_data(user_id):
+        user = User.query.get(user_id)
+        data = {}
+        if user:
+            completions = user.habit_completions
+            #create a dictionary that has key-value pair of habit_id:number of completions
+            for completion in completions:
+                habit_id = completion.habit_id
+                if habit_id in data:
+                    data[habit_id] += 1
+                else:
+                    data[habit_id] = 1
+            #split data into two lists, one containing habit descriptions, the other num of completions
+            count = list(data.values())
+            #get the habit ids from data, match them with their descriptions, and store in a list
+            descriptions = []
+            for key in data:
+                habit = HabitService.get_habit(key)
+                if habit:
+                    descriptions.append(habit.habit_description)
+            return descriptions, count
         return [], [] #return nothing if the user doesn't exist
