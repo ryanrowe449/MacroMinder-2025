@@ -39,8 +39,9 @@ class CompletionLog(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     protein = db.Column(db.Integer, default=0)
+    carbs = db.Column(db.Integer, default=0)
+    fats = db.Column(db.Integer, default=0)
     calories = db.Column(db.Integer, default=0)
-    tasks_completed = db.Column(db.Integer, default=0)
     weightlbs = db.Column(db.DECIMAL(4, 2), default=150)
     user = relationship("User", backref="completionlogs") #gets all the logs linked to a user
 

@@ -14,7 +14,7 @@ class CompletionLogService:
     # Instead of having an edit button, we 'limit' the user to one log per day by checking against 
     # the date stored in the db, serves as 'edit' functionality as well.
     @staticmethod
-    def add_completion_log(user_id, date, protein=0, calories=0, tasks_completed=0, weightlbs=150):
+    def add_completion_log(user_id, date, protein=0, calories=0, weightlbs=150, carbs=0, fats=0):
         # Check if there is already a log for the given user and date
         existing_log = CompletionLog.query.filter_by(user_id=user_id, date=date).first()
 
@@ -22,7 +22,8 @@ class CompletionLogService:
             # Update the existing log
             existing_log.protein = protein
             existing_log.calories = calories
-            existing_log.tasks_completed = tasks_completed
+            existing_log.carbs = carbs
+            existing_log.fats = fats
             existing_log.weightlbs = weightlbs
         else:
             # Create a new log
@@ -31,30 +32,14 @@ class CompletionLogService:
                 date=date,
                 protein=protein,
                 calories=calories,
-                tasks_completed=tasks_completed,
-                weightlbs=weightlbs
+                weightlbs=weightlbs,
+                carbs = carbs,
+                fats = fats
             )
             db.session.add(new_log)
 
         db.session.commit()
         return existing_log.tracking_id if existing_log else new_log.tracking_id
-
-    @staticmethod
-    def edit_completion_log(log_id, protein=None, calories=None, tasks_completed=None, weightlbs=None):
-        log = CompletionLog.query.get(log_id)
-        if log:
-            if protein is not None:
-                log.protein = protein
-            if calories is not None:
-                log.calories = calories
-            if tasks_completed is not None:
-                log.tasks_completed = tasks_completed
-            if weightlbs is not None:
-                log.weightlbs = weightlbs
-            db.session.commit()
-            return True
-        else:
-            return False
 
     @staticmethod
     def delete_completion_log(log_id):
@@ -105,3 +90,23 @@ class CompletionLogService:
         dates = sorted(data.keys())
         protein = [data[date] for date in dates]
         return dates, protein
+    
+    @staticmethod
+    def get_carbs_data(user_id):
+        logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        data = {}
+        for log in logs:
+            data[log.date] = log.carbs
+        dates = sorted(data.keys())
+        carbs = [data[date] for date in dates]
+        return dates, carbs
+    
+    @staticmethod
+    def get_fats_data(user_id):
+        logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        data = {}
+        for log in logs:
+            data[log.date] = log.fats
+        dates = sorted(data.keys())
+        fats = [data[date] for date in dates]
+        return dates, fats

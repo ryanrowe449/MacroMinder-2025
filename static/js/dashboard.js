@@ -232,6 +232,8 @@ async function logMacros(event) {
     event.preventDefault();
 
     const protein = document.getElementById('proteinInput').value;
+    const carbs = document.getElementById('carbsInput').value;
+    const fats = document.getElementById('fatsInput').value;
     const calories = document.getElementById('caloriesInput').value;
     const weightlbs = document.getElementById('weightInput').value;
 
@@ -239,6 +241,8 @@ async function logMacros(event) {
         protein: protein,
         calories: calories,
         weightlbs: weightlbs,
+        carbs: carbs,
+        fats: fats,
         date: getCurrentDateString()
     };
 

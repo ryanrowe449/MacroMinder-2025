@@ -27,16 +27,11 @@
     </div>
     <div class="bg-white">
         <h2 class="tm-block-title">Graphs</h2>
-        <!--first row-->
-        <div class="graph-container">
-            <div class="bg-white">
-                {{ weight_graph | safe }}
-            </div>
-            <div class="bg-white">
-                {{ completions_graph | safe }}
-            </div>
+        <!--first row, the macros altogether-->
+        <div class="bg-white">
+            {{ macros_graph | safe }}
         </div>
-        <!--second row-->
+        <!--second and third row, macros broken down-->
         <div class="graph-container">
             <div class="bg-white">
                 {{ calories_graph | safe }}
@@ -44,6 +39,22 @@
             <div class="bg-white">
                 {{ protein_graph | safe }}
             </div>
+        </div>
+        <div class="graph-container">
+            <div class="bg-white">
+                {{ carbs_graph | safe }}
+            </div>
+            <div class="bg-white">
+                {{ fats_graph | safe }}
+            </div>
+        </div>
+        <!--fourth row, weight-->
+        <div class="bg-white">
+            {{weight_graph | safe }}
+        </div>
+        <!--fifth row, completions-->
+        <div class="bg-white">
+            {{ completions_graph | safe }}
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>

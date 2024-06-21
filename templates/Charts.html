@@ -38,6 +38,15 @@
                 {{ habits_piechart | safe }}
             </div>
         </div>
+        <!--second row-->
+        <div class="graph-container">
+            <div class="bg-white">
+                {{ weekly_completions_bar | safe }}
+            </div>
+            <div class="bg-white">
+                {{ weekly_completions_pie | safe }}
+            </div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

@@ -72,11 +72,17 @@
                         <!--------------------------- MACROS --------------------------->
                         <div id="macros">
                             <form id="macrosForm" onsubmit="logMacros(event)">
+                                <label for="caloriesInput">Calories:</label>
+                                <input type="number" id="caloriesInput" name="caloriesInput" required>
+                                <br>
                                 <label for="proteinInput">Protein (grams):</label>
                                 <input type="number" id="proteinInput" name="proteinInput" required>
                                 <br>
-                                <label for="caloriesInput">Calories:</label>
-                                <input type="number" id="caloriesInput" name="caloriesInput" required>
+                                <label for="carbsInput">Carbohydrates (grams):</label>
+                                <input type="number" id="carbsInput" name="carbsInput" required>
+                                <br>
+                                <label for="fatsInput">Fats (grams):</label>
+                                <input type="number" id="fatsInput" name="fatsInput" required>
                                 <br>
                                 <label for="weightInput">Current Weight (lbs):</label>
                                 <input type="number" id="weightInput" name="weightInput" required>
