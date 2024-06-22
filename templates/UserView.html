@@ -12,21 +12,23 @@
 </head>
 <body id="reportsPage">
     <div id="header-bar">
-        <form action="/lifecoach/dashboard" method="GET">
-            <button type="submit" style="position:absolute; top:20px; left:20px;">Back</button>
-        </form>
+        <button class="openbtn" onclick="toggleMenu()">☰ Menu</button>
         <h1>Macrominder</h1>
+    </div>
+    <!--sliding menu-->
+    <div id="myMenu" class="menu">
+        <!--the links are clickable, so javascript:void(0) makes the link do nothing when clicked,
+        allowing toggleMenu to replace its normal behavior. &times creates an 'x' symbol-->
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
+        <a href="/go_home?user_id={{user_id}}">Dashboard</a>
+        <a href="/load_graphs_page?user_id={{user_id}}">Graphs</a>
+        <a href="/load_charts_page?user_id={{user_id}}">Charts</a>
+        <a href="/lifecoach/dashboard">Back</a>
     </div>
     <div id="tm-col tm-col-big" style="text-align: center;">
         <button onclick="previousDate()">◀</button>
         <span id="currentDate" style="display: inline-block;">{{ current_date }}</span>
         <button onclick="nextDate()">▶</button>
-    </div>
-    <!--logout button-->
-    <div class="logout-button">
-        <form action="/signout" method="GET, POST">
-            <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
     </div>
     <div class="" id="home">
         <div class="container">
@@ -54,29 +56,28 @@
                             <button type="submit" class="btn btn-primary">Manage Habits</button>
                         </form>                                               
                     </div>
-                    <!--<div>
-                        <div class="tm-col tm-col-big">
-                            <div class="bg-white tm-block h-100">
-                                {{ graph_html | safe }}
-                            </div>
-                        </div>
-                    </div>-->
                 </div>
                 <div class="tm-col tm-col-big">
                     <div class="bg-white tm-block h-100">
                         <h2 class="tm-block-title">Macro Tracker</h2>
                         <!--------------------------- MACROS --------------------------->
                         <div id="macros">
-                            <form id="macrosForm" onsubmit="lifecoachLogMacros(event)">
+                            <form id="macrosForm" onsubmit="logMacros(event)">
                                 <!-- Hidden input field to store the user_id -->
-                                <input type="hidden" id="user_id" name="user_id" value="{{ user.id }}">
+                                <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
                 
                                 <!-- Existing input fields for macros -->
+                                <label for="caloriesInput">Calories:</label>
+                                <input type="number" id="caloriesInput" name="caloriesInput" required>
+                                <br>
                                 <label for="proteinInput">Protein (grams):</label>
                                 <input type="number" id="proteinInput" name="proteinInput" required>
                                 <br>
-                                <label for="caloriesInput">Calories:</label>
-                                <input type="number" id="caloriesInput" name="caloriesInput" required>
+                                <label for="carbsInput">Carbohydrates (grams):</label>
+                                <input type="number" id="carbsInput" name="carbsInput" required>
+                                <br>
+                                <label for="fatsInput">Fats (grams):</label>
+                                <input type="number" id="fatsInput" name="fatsInput" required>
                                 <br>
                                 <label for="weightInput">Current Weight (lbs):</label>
                                 <input type="number" id="weightInput" name="weightInput" required>
@@ -86,11 +87,6 @@
                         </div>
                         <canvas id="lineChart"></canvas>
                     </div>
-                    <!--<div class="tm-col tm-col-big">
-                        <div class="bg-white tm-block h-100">
-                            {{ macros_html | safe }}
-                        </div>
-                    </div>-->
                 </div>
             
                 <div class="tm-col tm-col-big">

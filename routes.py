@@ -44,7 +44,7 @@ def go_home():
     role = session.get('role')
     #if the logged-in user is a life coach, go back to the page of their client. If not, load the User's page
     if role == 'LifeCoach':
-        user_id = request.form.get('user_id')
+        user_id = request.args.get('user_id')
         return redirect(url_for('view_user', user_id=user_id))
     elif role == 'User':
         return redirect(url_for('user_dashboard'))
@@ -59,9 +59,10 @@ def load_graphs_page():
     carbs_graph = GraphService.generate_carbs_over_time_graph(user_id)
     fats_graph = GraphService.generate_fats_over_time_graph(user_id)
     macros_graph = GraphService.generate_macros_over_time_graph(user_id)
+    role = session.get('role')
     return render_template('Graphs.html', userid=user_id, weight_graph=weight_graph, completions_graph=completions_graph, 
                            macros_graph=macros_graph, calories_graph=calories_graph, protein_graph=protein_graph,
-                           carbs_graph=carbs_graph, fats_graph=fats_graph)
+                           carbs_graph=carbs_graph, fats_graph=fats_graph, role=role)
 
 @app.route('/load_charts_page')
 def load_charts_page():
@@ -70,7 +71,9 @@ def load_charts_page():
     habits_piechart = GraphService.generate_habit_progress_piechart(user_id)
     weekly_completions_bar = GraphService.generate_weekly_completion_summary_bar(user_id)
     weekly_completions_pie = GraphService.generate_weekly_completion_summary_pie(user_id)
-    return render_template('Charts.html', userid=user_id, habits_barchart=habits_barchart, habits_piechart=habits_piechart, weekly_completions_bar=weekly_completions_bar, weekly_completions_pie=weekly_completions_pie)
+    role = session.get('role')
+    return render_template('Charts.html', userid=user_id, habits_barchart=habits_barchart, habits_piechart=habits_piechart, 
+                           weekly_completions_bar=weekly_completions_bar, weekly_completions_pie=weekly_completions_pie, role=role)
 
 #route to log out of current account
 #Explaining the use of session here, it is a feature provided by flask that
@@ -323,8 +326,9 @@ def deleteHabit():
 @app.route('/addmacros', methods=['POST'])
 def add_macros():
     # Add macro to the database
-    userid = session.get('userid')
+    #user_id = session.get('userid')
     data = request.get_json()
+    user_id = data['user_id']
     protein = data['protein']
     carbs = data['carbs']
     fats = data['fats']
@@ -333,7 +337,7 @@ def add_macros():
     current_date = session.get('current_date')
     current_date = TimeService.parse_session_date(current_date)
 
-    new_macro = CompletionLogService.add_completion_log(userid, current_date, protein, calories, weightlbs, carbs, fats)
+    new_macro = CompletionLogService.add_completion_log(user_id, current_date, protein, calories, weightlbs, carbs, fats)
   
     return jsonify({"success": True})
 # ----------------------- LIFECOACH ROUTES ---------------------------------------
@@ -369,30 +373,11 @@ def view_user(user_id):
         return redirect(url_for('lifecoach_dashboard'))
     
     habits = HabitService.list_habits(user_id, current_date)
-    
-    #graph_html = GraphService.generate_habit_progress_graph(current_date, user_id)
-
-    # Generate weight over time graph HTML
-    #macros_html = GraphService.generate_weight_over_time_graph(user_id)
     completions = HabitCompletionService.get_completions(user_id, current_date)
     completions_dict = {completion.habit_id: True for completion in completions}
 
     # Render the UserView.html template with the user's information
-    return render_template('UserView.html', user=user, user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, completions=completions_dict)
-
-#coaches log macros, essentially the same as users but takes in the users ID so that it is added for them not the coach
-@app.route('/coach/logmacros', methods=['POST'])
-def coach_log_macros():
-    user_id = request.json.get('user_id')
-    data = request.get_json()
-    protein = data['protein']
-    calories = data['calories']
-    weightlbs = data['weightlbs']
-    current_date = TimeService.parse_session_date(data['date'])
-
-    new_macro = CompletionLogService.add_completion_log(user_id, current_date, protein, calories, 0, weightlbs)
-  
-    return jsonify({"success": True})
+    return render_template('UserView.html', user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, completions=completions_dict)
         
 #sets the session id to the next date, using TimeService
 @app.route('/nextday', methods=['POST'])

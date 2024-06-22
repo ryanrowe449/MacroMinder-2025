@@ -12,8 +12,7 @@
 </head>
 <body id="managementPage">
     <div id="header-bar">
-        <form id="go-back-form" method="POST" action="/go_home">
-            <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+        <form id="go-back-form" method="POST" action="/go_home?user_id={{userid}}">
             <button type="submit" style="position:absolute; top:20px; left:20px;">Back</button>
         </form>
         <h1>Macrominder</h1>

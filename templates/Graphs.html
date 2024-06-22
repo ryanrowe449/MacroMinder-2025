@@ -18,12 +18,16 @@
     <!--sliding menu-->
     <div id="myMenu" class="menu">
         <a href="javascript:void(0)" class="closebtn" onclick="toggleMenu()">&times;</a>
-        <a href="/go_home">Dashboard</a>
+        <a href="/go_home?user_id={{userid}}">Dashboard</a>
         <a href="/load_graphs_page?user_id={{userid}}">Graphs</a>
         <a href="/load_charts_page?user_id={{userid}}">Charts</a>
-        <form action="/signout" method="GET, POST">
-            <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
+        {% if role == 'User' %}
+            <form action="/signout" method="GET, POST">
+                <button type="submit" class="btn btn-primary">Logout</button>
+            </form>
+        {% else %}
+            <a href="/lifecoach/dashboard">Back</a>
+        {% endif %}
     </div>
     <div class="bg-white">
         <h2 class="tm-block-title">Graphs</h2>

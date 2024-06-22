@@ -236,8 +236,10 @@ async function logMacros(event) {
     const fats = document.getElementById('fatsInput').value;
     const calories = document.getElementById('caloriesInput').value;
     const weightlbs = document.getElementById('weightInput').value;
+    const user_id = document.getElementById('user_id').value
 
     const data = {
+        user_id: user_id,
         protein: protein,
         calories: calories,
         weightlbs: weightlbs,
@@ -247,43 +249,6 @@ async function logMacros(event) {
     };
 
     const response = await fetch('/addmacros', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    if (result.success) {
-        console.log('Macros logged');
-        location.reload()
-    } else {
-        alert('Failed to log macros');
-    }
-
-    updateDate();
-}
-
-// Function to log macros
-async function lifecoachLogMacros(event) {
-    event.preventDefault();
-
-    const protein = document.getElementById('proteinInput').value;
-    const calories = document.getElementById('caloriesInput').value;
-    const weightlbs = document.getElementById('weightInput').value;
-
-    const user_id = document.getElementById('user_id').value; // Get user_id from hidden input
-
-    const data = {
-        user_id: user_id, // Include user_id in the data
-        protein: protein,
-        calories: calories,
-        weightlbs: weightlbs,
-        date: getCurrentDateString()
-    };
-
-    const response = await fetch('/coach/logmacros', { // Use the new endpoint for coaches
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
