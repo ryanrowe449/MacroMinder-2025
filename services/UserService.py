@@ -12,6 +12,18 @@ class UserService:
         db.session.commit()
         return new_user
     
+    def get_user(user_id=None, username=None, role=None):
+        if role:
+            if username:
+                return User.query.filter_by(username=username, role=role).first()
+            else:
+                return User.query.filter_by(id=user_id, role=role).first()
+        else:
+            if username:
+                return User.query.filter_by(username=username)
+            else:
+                return User.query.filter_by(id=user_id).first()
+    
     @staticmethod
     def update_user(user_id, username=None, password=None, role=None):
         user = User.query.get(user_id)
@@ -49,21 +61,11 @@ class UserService:
         return User.query.filter_by(role='LifeCoach').all()
     
     @staticmethod
-    def link_user_and_coach(user_id, life_coach_id):
-        try:
-            # Check if the user is already linked to a coach
-            existing_link = CoachingGroups.query.filter_by(user_id=user_id).first()
-            if existing_link:
-                # If a link already exists, update the coach_id
-                existing_link.life_coach_id = life_coach_id
-            else:
-                # If no link exists, create a new entry in the CoachingGroups table
-                new_link = CoachingGroups(user_id=user_id, life_coach_id=life_coach_id)
-                db.session.add(new_link)
-
-            db.session.commit()
-            return True
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-            return False
+    def get_connected_coach(user_id):
+        group = CoachingGroups.query.filter_by(user_id=user_id).first()
+        coach = None
+        if group:
+            if group.rel_status == 'friends':
+                coach_id = group.coach_id
+                coach = UserService.get_user(user_id=coach_id, role='LifeCoach')
+        return coach

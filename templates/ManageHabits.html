@@ -43,7 +43,6 @@
                             <label class="day" for="habit_{{ habit.habit_id }}_checkbox_{{ i }}">{{ labels[i] }}</label>
                         {% endfor %}
                     </div>
-                    <!--<button type="button" onclick="showEditPopup('{{ habit.habit_id }}', '{{ habit.habit_description }}')">Edit</button>-->
                     <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>
                 </form>
             {% endfor %}

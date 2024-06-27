@@ -175,25 +175,25 @@ def user_dashboard():
     #we have to use this to get the session date in a format the db can read
     current_date = TimeService.parse_session_date(session_date)
 
-    life_coaches = UserService.get_life_coaches()
+    '''life_coaches = UserService.get_life_coaches()
     connected_coach = None
     for coach in life_coaches:
-        coaching_group = CoachingGroups.query.filter_by(user_id=userid, life_coach_id=coach.id).first()
+        coaching_group = CoachingGroups.query.filter_by(user_id=userid, coach_id=coach.id).first()
         if coaching_group:
             connected_coach = coach
-            break 
-
-    #use graphservice to create the 2 graphs printed on the dashboard
-    #graph_html = GraphService.generate_habit_progress_graph(current_date, userid)
-    #macros_html = GraphService.generate_weight_over_time_graph(userid)
-
+            break'''
+    connected_coach = UserService.get_connected_coach(userid)
+    request = CoachingService.get_requested_pair(userid)
+    requested_coach = None
+    if request:
+        requested_coach = UserService.get_user(request.coach_id)
     habits = HabitService.list_habits(userid, current_date) #add date parameter
     completions = HabitCompletionService.get_completions(userid, current_date)
     completions_dict = {completion.habit_id: True for completion in completions}
     
     return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
-                           username=username, life_coaches=life_coaches, connected_coach=connected_coach,
-                           completions=completions_dict)
+                           username=username, connected_coach=connected_coach, request=request,
+                           requested_coach=requested_coach, completions=completions_dict)
 
 
 @app.route('/managehabits', methods=['POST'])
@@ -237,14 +237,13 @@ def update_habits():
 
 #A route to set a coach, called when a user clicks on an available lifecoach in the dashboard
 #uses Userservice to link a lifecoach and user in the CoachingGroups database table
-@app.route('/set_coach/<int:life_coach_id>', methods=['POST'])
-def set_coach(life_coach_id):
-    print("Set coach route triggered")
+@app.route('/set_coach/<int:coach_id>', methods=['POST'])
+def set_coach(coach_id):
     if session.get('role') != 'User':
         return redirect(url_for('login'))
     user_id = session.get('userid')
 
-    success = UserService.link_user_and_coach(user_id, life_coach_id)
+    success = CoachingService.create_link(user_id, coach_id)
     if success:
         flash('Coach added successfully')
     else:
@@ -322,6 +321,44 @@ def deleteHabit():
     else:
         return jsonify({'success': False, 'message': 'Habit not found'})
     
+@app.route('/deletecoachinggroup', methods=['POST'])
+def delete_coaching_group():
+    coach_id = request.form.get('coach_id')
+    user_id = session.get('userid')
+    success = CoachingService.delete_link(user_id, coach_id)
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': 'Coach not found'})
+    
+@app.route('/searchcoach', methods=['POST'])
+def search_coach():
+    username = request.form.get('coach_name')
+    coach = UserService.get_user(username=username, role='LifeCoach')
+    if coach:
+        coach_data = {
+            'id': coach.id,
+            'username': coach.username
+        }
+        return jsonify({'success': True, 'coach_data': coach_data})
+    else:
+        return jsonify({'success': False, 'message': 'Coach not found'})
+    
+@app.route('/sendrequest', methods=['POST'])
+def send_request():
+    user_id = session.get('userid')
+    coach_id = request.form.get('coach_id')
+    coach = UserService.get_user(coach_id)
+    if user_id and coach_id and coach:
+        CoachingService.create_link(user_id, coach_id)
+        coach_data = {
+            'id': coach.id,
+            'username': coach.username
+        }
+        return jsonify({'success': True, 'coach_data': coach_data})
+    else:
+        return jsonify({'success': False})
+    
 #called when a user submits macro information, passes information to CompletionLogService
 @app.route('/addmacros', methods=['POST'])
 def add_macros():
@@ -353,11 +390,12 @@ def lifecoach_dashboard():
     # Get the lifecoach's ID from the session
     lifecoach_id = session.get('userid')
 
-    # Fetch paired users for the lifecoach
+    # Fetch paired/requested users for the lifecoach
     paired_users = CoachingService.get_paired_users(lifecoach_id)
+    requested_users = CoachingService.get_requested_users(lifecoach_id)
 
     # Render the lifecoach dashboard template with paired users
-    return render_template('LifecoachDashboard.html', paired_users=paired_users, username=username)
+    return render_template('LifecoachDashboard.html', paired_users=paired_users, requested_users=requested_users, username=username)
 
 #the view of the users dashboard from a lifecoach view, prints everything a user might see from userdashboard
 #everything there applies here.

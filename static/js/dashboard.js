@@ -129,9 +129,115 @@ function deleteHabit(habitId, event) {
                 console.log('Habit deleted');
                 const habitElement = document.getElementById(`habitForm_${habitId}`);
                 habitElement.parentNode.removeChild(habitElement);
-                closeEditPopup();
             } else {
                 alert('Failed to delete habit');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+//function to delete a coach-client relationship and reflect that in the html
+function removeCoach(coach_id, event){
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('coach_id', coach_id);
+    fetch('/deletecoachinggroup', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //get the content of coach containers
+                const connectedCoach = document.getElementById('connected-coach');
+                const coachContainer = document.getElementById('coach-container');
+                //remove current content
+                connectedCoach.innerHTML = '';
+                coachContainer.innerHTML = '';
+                //replace with message
+                const connCoach = `<p style="color: black;">You have no coach</p>`;
+                connectedCoach.innerHTML = connCoach;
+                //replace with search form
+                const searchFormHtml = `
+                    <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                        <input type="text" id="coach_name" name="coach_name" required>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                `;
+                coachContainer.innerHTML = searchFormHtml;
+            } else {
+                alert('Failed to delete coaching group');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+//function to search for a coach and display a response
+function searchCoach(event){
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    fetch('/searchcoach', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success){
+                const coach = data.coach_data;
+                const coachContainer = document.getElementById('coach-container');
+                coachContainer.innerHTML = '';
+                const coachInfo = `<form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                                        <input type="text" id="coach_name" name="coach_name" required>
+                                        <button type="submit" class="btn btn-primary">Search</button>
+                                    </form>
+                                    <label style="color: black;">${coach.username}</label>
+                                    <button type="button" onclick="sendRequest('${ coach.id }', event)">Request</button>`;
+                coachContainer.innerHTML = coachInfo
+            }
+            else{
+                const coachContainer = document.getElementById('coach-container');
+                coachContainer.innerHTML = '';
+                const message = `<form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                                    <input type="text" id="coach_name" name="coach_name" required>
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </form>
+                                <p style="color: black;">No coaches found</p>`
+                                ;
+                coachContainer.innerHTML = message;
+            }
+        })
+}
+
+//function to send a 'friend' request from user to a lifecoach
+function sendRequest(coach_id, event){
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('coach_id', coach_id);
+    fetch('/sendrequest', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const coach = data.coach_data;
+                //get the content of coach containers
+                const coachContainer = document.getElementById('coach-container');
+                //remove current content
+                coachContainer.innerHTML = '';
+                //replace with request
+                const requestFormHtml = `
+                    <label style="color: black;">${coach.username}</label>
+                    <button type="button" onclick="removeCoach('${ coach.id }', event)">Cancel Request</button>
+                `;
+                coachContainer.innerHTML = requestFormHtml;
+            } else {
+                alert('Failed to send request');
             }
         })
         .catch(error => {

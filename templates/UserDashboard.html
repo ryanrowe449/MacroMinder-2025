@@ -87,35 +87,35 @@
                         <canvas id="lineChart"></canvas>
                     </div>
                     
-                    <!--<div class="tm-col tm-col-big">
-                        <div class="bg-white tm-block h-100">
-                            {{ macros_html | safe }}
-                        </div>
-                    </div>-->
-                    
                 </div>
-                <div class="tm-col tm-col-big">
-                    <div class="bg-white tm-block h-100">
+                <div class="tm-col">
+                    <div class="bg-white">
                         <h2 class="tm-block-title">Welcome, {{ username }}!</h2>
-                        {% if connected_coach %}
-                            <p style="color: black;">Your coach is {{ connected_coach.username }}</p>
-                        {% else %}
-                            <li style="color: black;"><p>You have no coach</p>
-                        {% endif %}
+                        <div id="connected-coach">
+                            {% if connected_coach %}
+                                <p style="color: black;">Your coach is {{ connected_coach.username }}</p>
+                            {% else %}
+                                <p style="color: black;">You have no coach</p>
+                            {% endif %}
+                        </div>
                     </div>                    
-                    <div class="tm-col tm-col-big">
-                        <div class="bg-white tm-block h-100">
-                            <h2 class="tm-block-title">Life Coach Lookup</h2>
-                            <ul>
-                                {% for coach in life_coaches %}
-                                <li>
-                                    <span><li style="color: black;">{{ coach.username }}</li></span>
-                                    <form action="/set_coach/{{ coach.id }}" method="POST">
-                                        <button type="submit" class="btn btn-primary">Set as Coach</button>
+                    <div class="tm-col">
+                        <div class="bg-white">
+                            <h2 class="tm-block-title">Life Coach Search</h2>
+                            <div id="coach-container">
+                                {% if connected_coach %}
+                                    <p style="color: black;">{{ connected_coach.username }}</p>
+                                    <button type="button" onclick="removeCoach('{{ connected_coach.id }}', event)">Remove</button>
+                                {% elif request.rel_status == 'pending' %}
+                                    <label style="color: black;">{{requested_coach.username}}</label>
+                                    <button type="button" onclick="removeCoach('{{ requested_coach.id }}', event)">Cancel Request</button>
+                                {% else %}
+                                    <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                                        <input type="text" id="coach_name" name="coach_name" required>
+                                        <button type="submit" class="btn btn-primary">Search</button>
                                     </form>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

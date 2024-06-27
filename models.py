@@ -57,7 +57,8 @@ class HabitCompletion(db.Model):
 # Db table for keeping life coaches linked with their standard users
 class CoachingGroups(db.Model):
     __tablename__ = 'CoachingGroups'
-    life_coach_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
+    coach_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
-    life_coach = relationship("User", foreign_keys=[life_coach_id])
+    rel_status = db.Column(db.String(80), nullable=False)
+    life_coach = relationship("User", foreign_keys=[coach_id])
     user = relationship("User", foreign_keys=[user_id])
