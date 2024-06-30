@@ -31,38 +31,46 @@
                 <div class="tm-col">
                     <div class="bg-white">
                         <h2 class="tm-block-title">Clients</h2>
+                        <div id="clients-container">
                             {% if paired_users %}
                                 {% for user in paired_users %}
-                                    <li style="color: black;">
-                                        {{ user.username }}
-                                        <form action="/viewuser/{{ user.id }}" method="GET">
-                                            <button type="submit" class="btn btn-primary">View User</button>
-                                        </form>
-                                    </li>
+                                <div id="client-{{user.id}}">
+                                    <form action="/viewuser/{{ user.id }}" method="GET">
+                                        <label style="color: black;">{{ user.username }}</label>
+                                        <button type="submit" class="btn btn-primary">View User</button>
+                                        <button type="button" onclick="deleteClient('{{ user.id }}', event)">Delete</button>
+                                    </form>
+                                </div>
                                 {% endfor %}
                             {% else %}
                                 <p style="color: black;">You have no clients</p>
                             {% endif %}
+                        </div>
                     </div>
                 </div>
                 <!--requests column-->
                 <div class="tm-col">
                     <div class="bg-white">
-                        <h2 class="tm-block-title">Incoming Requests</h2>
+                    <h2 class="tm-block-title">Incoming Requests</h2>
+                        <div id="requests-container">
                             {% if requested_users %}
                                 {% for user in requested_users %}
+                                    <div id="user-{{user.id}}">
                                         <label style="color: black;">{{ user.username }}</label>
-                                        <button onclick="acceptRequest('{{ user.id }}', event)">✅</button>
-                                        <button onclick="denyRequest('{{ user.id }}', event)">❌</button>
+                                        <button type="button" onclick="acceptRequest('{{ user.id }}', event)">✅</button>
+                                        <button type="button" onclick="denyRequest('{{ user.id }}', event)">❌</button>
+                                    </div>
                                 {% endfor %}
                             {% else %}
                                 <p style="color: black;">You have no incoming requests</p>
                             {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 
 </html>

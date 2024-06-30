@@ -105,10 +105,10 @@
                             <div id="coach-container">
                                 {% if connected_coach %}
                                     <p style="color: black;">{{ connected_coach.username }}</p>
-                                    <button type="button" onclick="removeCoach('{{ connected_coach.id }}', event)">Remove</button>
+                                    <button type="button" onclick="removeCoach('{{ userid }}', event)">Remove</button>
                                 {% elif request.rel_status == 'pending' %}
                                     <label style="color: black;">{{requested_coach.username}}</label>
-                                    <button type="button" onclick="removeCoach('{{ requested_coach.id }}', event)">Cancel Request</button>
+                                    <button type="button" onclick="removeCoach('{{ userid }}', event)">Cancel Request</button>
                                 {% else %}
                                     <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
                                         <input type="text" id="coach_name" name="coach_name" required>

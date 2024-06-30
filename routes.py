@@ -174,14 +174,6 @@ def user_dashboard():
     session_date = session.get('current_date')
     #we have to use this to get the session date in a format the db can read
     current_date = TimeService.parse_session_date(session_date)
-
-    '''life_coaches = UserService.get_life_coaches()
-    connected_coach = None
-    for coach in life_coaches:
-        coaching_group = CoachingGroups.query.filter_by(user_id=userid, coach_id=coach.id).first()
-        if coaching_group:
-            connected_coach = coach
-            break'''
     connected_coach = UserService.get_connected_coach(userid)
     request = CoachingService.get_requested_pair(userid)
     requested_coach = None
@@ -234,22 +226,6 @@ def update_habits():
             return jsonify({'success': False, 'message': 'You must be logged in to update habits.'})
 
     return jsonify({'success': False, 'message': 'Invalid request method.'})
-
-#A route to set a coach, called when a user clicks on an available lifecoach in the dashboard
-#uses Userservice to link a lifecoach and user in the CoachingGroups database table
-@app.route('/set_coach/<int:coach_id>', methods=['POST'])
-def set_coach(coach_id):
-    if session.get('role') != 'User':
-        return redirect(url_for('login'))
-    user_id = session.get('userid')
-
-    success = CoachingService.create_link(user_id, coach_id)
-    if success:
-        flash('Coach added successfully')
-    else:
-        flash('Failed to add coach')
-
-    return redirect(url_for('user_dashboard'))
 
 #route to render the addhabit page or add a habit
 #called when a user clicks 'add' for a habit, takes the habit description and uses it to create a new habit for that date
@@ -323,13 +299,13 @@ def deleteHabit():
     
 @app.route('/deletecoachinggroup', methods=['POST'])
 def delete_coaching_group():
-    coach_id = request.form.get('coach_id')
-    user_id = session.get('userid')
-    success = CoachingService.delete_link(user_id, coach_id)
+    user_id = request.form.get('user_id')
+    #user_id = session.get('userid')
+    success = CoachingService.delete_link(user_id)
     if success:
         return jsonify({'success': True})
     else:
-        return jsonify({'success': False, 'message': 'Coach not found'})
+        return jsonify({'success': False})
     
 @app.route('/searchcoach', methods=['POST'])
 def search_coach():
@@ -374,7 +350,7 @@ def add_macros():
     current_date = session.get('current_date')
     current_date = TimeService.parse_session_date(current_date)
 
-    new_macro = CompletionLogService.add_completion_log(user_id, current_date, protein, calories, weightlbs, carbs, fats)
+    CompletionLogService.add_completion_log(user_id, current_date, protein, calories, weightlbs, carbs, fats)
   
     return jsonify({"success": True})
 # ----------------------- LIFECOACH ROUTES ---------------------------------------
@@ -416,6 +392,17 @@ def view_user(user_id):
 
     # Render the UserView.html template with the user's information
     return render_template('UserView.html', user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, completions=completions_dict)
+
+@app.route('/setcoachinggroup', methods=['POST'])
+def set_coach():
+    coach_id = session.get('userid')
+    user_id = request.form.get('user_id')
+    success = CoachingService.create_link(user_id, coach_id)
+    if success:
+        user = UserService.get_user(user_id=user_id)
+        return jsonify({'success': True, 'username': user.username})
+    else:
+        return jsonify({'success': False})
         
 #sets the session id to the next date, using TimeService
 @app.route('/nextday', methods=['POST'])

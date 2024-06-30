@@ -139,10 +139,10 @@ function deleteHabit(habitId, event) {
 }
 
 //function to delete a coach-client relationship and reflect that in the html
-function removeCoach(coach_id, event){
+function removeCoach(user_id, event){
     event.preventDefault();
     const formData = new FormData();
-    formData.append('coach_id', coach_id);
+    formData.append('user_id', user_id);
     fetch('/deletecoachinggroup', {
         method: 'POST',
         body: formData
@@ -243,6 +243,98 @@ function sendRequest(coach_id, event){
         .catch(error => {
             console.error('Error:', error);
         });
+}
+
+function acceptRequest(user_id, event){
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    fetch('/setcoachinggroup', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //get the content of request container, the div for the user clicked, and the users displayed
+                const requestsContainer = document.getElementById('requests-container');
+                const userDiv = document.getElementById(`user-${user_id}`);
+                const userLabels = requestsContainer.getElementsByTagName('label');
+                //remove the user
+                userDiv.remove();
+                //if there are no users to display, replace with the message
+                if (userLabels.length == 0){
+                    const noRequests = `<p style="color: black;">You have no incoming requests</p>`;
+                    requestsContainer.innerHTML = noRequests;
+                }
+                 //get the clients container
+                const clientsContainer = document.getElementById('clients-container');
+                //if the message 'you have no clients' is there, get rid of it
+                if (clientsContainer.textContent.includes('You have no clients')) {
+                    clientsContainer.innerHTML = '';
+                }
+                //add the new client to the container
+                const newClient = `
+                        <form action="/viewuser/${user_id}" method="GET">
+                            <label style="color: black;">${data.username}</label>
+                            <button type="submit" class="btn btn-primary">View User</button>
+                            <button type="button" onclick="deleteClient('${ user_id }', event)">Delete</button>
+                        </form>
+                    `;
+                clientsContainer.innerHTML += newClient;
+            } else {
+                alert('Failed to accept request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+function denyRequest(user_id, event){
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    fetch('/deletecoachinggroup', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success){
+                const requestsContainer = document.getElementById('requests-container');
+                const userDiv = document.getElementById(`user-${user_id}`);
+                const userLabels = requestsContainer.getElementsByTagName('label');
+                userDiv.remove();
+                if (userLabels.length == 0){
+                    const noRequests = `<p style="color: black;">You have no incoming requests</p>`;
+                    requestsContainer.innerHTML = noRequests;
+                }
+            }
+        })
+}
+
+function deleteClient(user_id, event){
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    fetch('/deletecoachinggroup', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success){
+                const clientsContainer = document.getElementById('clients-container');
+                const clientLabels = clientsContainer.getElementsByTagName('label');
+                const clientDiv = document.getElementById(`client-${user_id}`);
+                clientDiv.remove();
+                if (clientLabels.length == 0){
+                    const noClients = `<p style="color: black;">You have no clients</p>`;
+                    clientsContainer.innerHTML = noClients;
+                }
+            }
+        })
 }
 
 //function to apply the changes a user has made to habits

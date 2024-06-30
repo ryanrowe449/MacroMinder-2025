@@ -34,8 +34,8 @@ class CoachingService:
         return True
     
     @staticmethod
-    def delete_link(user_id, coach_id):
-        link = CoachingGroups.query.filter_by(user_id=user_id, coach_id=coach_id).first()
+    def delete_link(user_id):
+        link = CoachingGroups.query.filter_by(user_id=user_id).first()
         if link:
             db.session.delete(link)
             db.session.commit()
