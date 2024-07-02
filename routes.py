@@ -233,15 +233,14 @@ def update_habits():
 def addHabit():
     if request.method == 'POST':
         description = request.form.get('habitdesc')
-        #userid = session.get('userid')
         userid = request.form.get('user_id') 
         current_date = session.get('current_date')
         current_date = TimeService.parse_session_date(current_date)
 
         if userid:
-            success, response = HabitService.add_habit(userid, description, current_date)
+            success, response = HabitService.add_habit(userid, description, current_date) #response is the habit id
             if success:
-                return jsonify({'success': True, 'habit_id': response})
+                return jsonify({'success': True, 'habit_id': response, 'desc': description})
             else:
                 return jsonify({'success': False, 'message': response})
         else:
@@ -269,7 +268,7 @@ def checkBox():
         db.session.commit()
         return jsonify({'success': True})
     else:
-        return jsonify({'success': False, 'message': 'Habit not found'})
+        return jsonify({'success': False})
 
 #called when a user clicks edit habit, queries for the new description and edits the desired habit with HabitService
 @app.route('/edithabit', methods=['POST'])

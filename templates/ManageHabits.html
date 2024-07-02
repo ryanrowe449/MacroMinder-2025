@@ -20,7 +20,7 @@
     <div class="bg-white tm-block h-100">
         <h2 class="tm-block-title">Habits</h2>
         <!--------------------------- HABITS --------------------------->
-        <div class="habit-list">
+        <div id="habit-list">
             {% for habit in habits %}
                 <form id="habitForm_{{ habit.habit_id }}">
                     <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
@@ -39,13 +39,14 @@
                                 {% if all_days_checked %} checked {% endif %}
                             {% else %} onchange="updateDailyCheckbox('{{ habit.habit_id }}')"
                             {% endif %}
-                            {% if i > 0 and getattr(habit, days[i]) %} checked {% endif %}> <!--if the attribute (T/F) of a column (day[i]) is true, check the box-->
+                            {% if i > 0 and getattr(habit, days[i]) %} checked {% endif %}> <!--if the attribute (T/F) of a column (days[i]) is true, check the box-->
                             <label class="day" for="habit_{{ habit.habit_id }}_checkbox_{{ i }}">{{ labels[i] }}</label>
                         {% endfor %}
                     </div>
                     <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>
                 </form>
             {% endfor %}
+        </div>
             <form id="add-habit-form" method="POST" onsubmit="addHabit(event)">
                 <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
                 <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
@@ -53,7 +54,6 @@
                 <button type="submit" class="btn btn-primary">Add Habit</button>
             </form>
             <button type="button" onclick="applyChanges()">Apply Changes</button>
-        </div>
     </div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

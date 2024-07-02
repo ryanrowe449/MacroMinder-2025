@@ -1,38 +1,111 @@
-// Function to format date
-function formatDate(date) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
-}
-
-// Function to add a new habit
-async function addHabit(event) {
+//function to add a habit and reflect in frontend
+function addHabit(event){
     event.preventDefault();
     const form = event.target;
-    const data = new FormData(form);
-    const response = await fetch('/addhabit', {
+    const formData = new FormData(form);
+    fetch('/addhabit', {
         method: 'POST',
-        body: data,
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success){
+                const habitsList = document.getElementById('habit-list');
+                const newHabit = `
+                <form id="habitForm_${data.habit_id}">
+                    <input type="hidden" name="habit_id" value="${data.habit_id}">
+                    <label class="habit-description" for="habit_${data.habit_id}" onclick="makeEditable(this)">${data.desc}</label>
+                    <input type="text" class="habit-input" style="display: none;" onblur="saveText(this)" onkeydown="handleKeyPress(event, this)">
+                    <div class="checkbox-container">
+                        ${['Daily', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((label, i) => `
+                            <input type="checkbox" id="habit_${data.habit_id}_checkbox_${i}" name="habit_${data.habit_id}_checkbox_${i}" class="day-checkbox"
+                            ${i === 0 ? `onclick="toggleCheckboxes('${data.habit_id}')"` : `onchange="updateDailyCheckbox('${data.habit_id}')"`} checked>
+                            <label class="day" for="habit_${data.habit_id}_checkbox_${i}">${label}</label>
+                            `).join('')}
+                    </div>
+                    <button type="button" onclick="deleteHabit('${data.habit_id}', event)">Delete</button>
+                </form>
+                `;
+                //habitsList.insertAdjacentHTML('beforeend', newHabit);
+                habitsList.innerHTML += newHabit;
+                form.reset();
+            }
+            else{
+                alert('Failed to add habit');
+            }
+        })
+}
+
+// Function to delete a habit
+function deleteHabit(habitId, event) {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('habit_id', habitId);
+    formData.append('date', getCurrentDateString()); // Append the date to the form data
+
+    fetch('/deletehabit', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Habit deleted');
+                const habitElement = document.getElementById(`habitForm_${habitId}`);
+                habitElement.parentNode.removeChild(habitElement);
+            } else {
+                alert('Failed to delete habit');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+//function to apply the changes a user has made to habits
+async function applyChanges() {
+    const forms = document.querySelectorAll('#habit-list form[id^="habitForm_"]'); //gets each individual habit form, use # to get by id
+    const changes = [];
+    const userId = document.getElementById('user_id').value;
+
+    forms.forEach(form => {
+        const habitId = form.querySelector('input[name="habit_id"]').value;
+        const habitDescription = form.querySelector('.habit-description').textContent;
+        
+        const checkboxes = form.querySelectorAll('.day-checkbox');
+        const days = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'];
+        const habitData = { habit_id: habitId, habit_description: habitDescription};
+
+        checkboxes.forEach((checkbox, index) => {
+            if (index > 0) { //skip 'daily' checkbox
+                habitData[days[index - 1]] = checkbox.checked; //store whether or not each checkbox is checked
+            }
+        });
+
+        changes.push(habitData);
     });
 
+    //restructuring data to include userId
+    const payload = {
+        user_id: userId,
+        habits: changes
+    };
+
+    //organize data into JSON array and send to /updatehabits
+    const response = await fetch('/updatehabits', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+    
     const result = await response.json();
+    
     if (result.success) {
-        const habitsList = document.querySelector('.habit-list');
-        const newHabitElement = document.createElement('div');
-        newHabitElement.innerHTML = `<input type="hidden" name="habit_id" value="${result.habit_id}">
-            <label class="habit-description" for="habit_${result.habit_id}">${data.get('habitdesc')}</label>
-            <div class="checkbox-container">
-                ${['Daily', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((label, i) => `
-                    <input type="checkbox" id="habit_${result.habit_id}_checkbox_${i}" name="habit_${result.habit_id}_checkbox_${i}" class="day-checkbox" ${i === 0 ? `onclick="dailyCheckbox('${result.habit_id}')"` : ''} checked>
-                    <label class="day" for="habit_${result.habit_id}_checkbox_${i}">${label}</label>
-                `).join('')}
-            </div>
-            <button type="button" onclick="deleteHabit('${result.habit_id}', event)">Delete</button>
-        `;
-        habitsList.insertBefore(newHabitElement, form);
-        form.reset();
-        location.reload();
+        alert('Changes applied successfully!');
     } else {
-        alert(result.message);
+        alert('Failed to apply changes: ' + result.message);
     }
 }
 
@@ -49,11 +122,8 @@ function checkBox(event, form) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                console.log('Habit completion logged');
-                location.reload()
-            } else {
-                alert('Failed to log habit completion');
+            if (!data.success) {
+                alert('Failed to log habit completion')
             }
         })
         .catch(error => {
@@ -110,32 +180,6 @@ function handleKeyPress(event, input) {
     if (event.key === 'Enter') {
         input.blur();
     }
-}
-
-// Function to delete a habit
-function deleteHabit(habitId, event) {
-    event.preventDefault();
-    const formData = new FormData();
-    formData.append('habit_id', habitId);
-    formData.append('date', getCurrentDateString()); // Append the date to the form data
-
-    fetch('/deletehabit', {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Habit deleted');
-                const habitElement = document.getElementById(`habitForm_${habitId}`);
-                habitElement.parentNode.removeChild(habitElement);
-            } else {
-                alert('Failed to delete habit');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
 }
 
 //function to delete a coach-client relationship and reflect that in the html
@@ -337,51 +381,10 @@ function deleteClient(user_id, event){
         })
 }
 
-//function to apply the changes a user has made to habits
-async function applyChanges() {
-    const forms = document.querySelectorAll('.habit-list form[id^="habitForm_"]'); //gets each individual habit form
-    const changes = [];
-    const userId = document.getElementById('user_id').value;
-
-    forms.forEach(form => {
-        const habitId = form.querySelector('input[name="habit_id"]').value;
-        const habitDescription = form.querySelector('.habit-description').textContent;
-        
-        const checkboxes = form.querySelectorAll('.day-checkbox');
-        const days = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'];
-        const habitData = { habit_id: habitId, habit_description: habitDescription};
-
-        checkboxes.forEach((checkbox, index) => {
-            if (index > 0) { //skip 'daily' checkbox
-                habitData[days[index - 1]] = checkbox.checked; //store whether or not each checkbox is checked
-            }
-        });
-
-        changes.push(habitData);
-    });
-
-    //restructuring data to include userId
-    const payload = {
-        user_id: userId,
-        habits: changes
-    };
-
-    //organize data into JSON array and send to /updatehabits
-    const response = await fetch('/updatehabits', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    });
-    
-    const result = await response.json();
-    
-    if (result.success) {
-        alert('Changes applied successfully!');
-    } else {
-        alert('Failed to apply changes: ' + result.message);
-    }
+// Function to format date
+function formatDate(date) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
 }
 
 function previousDate() {

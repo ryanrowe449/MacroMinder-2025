@@ -104,7 +104,7 @@
                             <h2 class="tm-block-title">Life Coach Search</h2>
                             <div id="coach-container">
                                 {% if connected_coach %}
-                                    <p style="color: black;">{{ connected_coach.username }}</p>
+                                    <label style="color: black;">{{ connected_coach.username }}</label>
                                     <button type="button" onclick="removeCoach('{{ userid }}', event)">Remove</button>
                                 {% elif request.rel_status == 'pending' %}
                                     <label style="color: black;">{{requested_coach.username}}</label>
