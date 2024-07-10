@@ -28,10 +28,6 @@ h1 {
     background: none;
 }
 
-.macro_graph .tm-block {
-    padding: 40px; /* Increased padding */
-}
-
 #macroGraphContainer {
     width: 800px; /* Set the width to fill the entire container */
     height: 500px;

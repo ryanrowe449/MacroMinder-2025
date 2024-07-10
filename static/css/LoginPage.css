@@ -20,12 +20,12 @@ body {
     box-shadow: 5px 20px 50px #000;
 }
 
-/* LoginPage.css */
 .main a {
     color: #fff; 
     text-align: center;
     display: block;
     margin-top: 20px; /* Add some top margin for spacing */
+    margin-bottom: 15px;
 }
 
 
@@ -49,7 +49,7 @@ h1 {
                   1px  1px 0 #000;
 }
 
-label {
+.label.headers {
     color: #fff;
     font-size: 2.3em;
     justify-content: center;
@@ -64,18 +64,40 @@ label {
                   1px  1px 0 #000;
 }
 
-input,
-select {
+/*fields are only used on the register page*/
+.label.fields{
+    color:yellow;
+    position: relative;
+    left: 60px;
+}
+
+/*input fields on register page have rounded corners, input fields on login page do not*/
+.input {
     width: 60%;
     height: 20px;
     background: #e0dede;
     justify-content: center;
     display: flex;
-    margin: 20px auto;
+    margin: 12px auto;
     padding: 10px;
     border: none;
     outline: none;
-    border-radius: 15px;
+}
+
+.input.loginField {
+    margin: 20px auto;
+    border-radius: 12px;
+}
+
+select{
+    width: 65%;
+    height: 25px;
+    background: #e0dede;
+    justify-content: center;
+    display: flex;
+    margin: 15px auto;
+    border: none;
+    outline: none;
 }
 
 button {
