@@ -10,7 +10,6 @@ class UserService:
         new_user = User(username=username, password=hashed_password, role=role)
         db.session.add(new_user)
         db.session.commit()
-        return new_user
     
     def get_user(user_id=None, username=None, role=None):
         if role:
@@ -20,7 +19,7 @@ class UserService:
                 return User.query.filter_by(id=user_id, role=role).first()
         else:
             if username:
-                return User.query.filter_by(username=username)
+                return User.query.filter_by(username=username).first()
             else:
                 return User.query.filter_by(id=user_id).first()
     

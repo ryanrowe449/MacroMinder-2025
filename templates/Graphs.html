@@ -22,9 +22,7 @@
         <a href="/load_graphs_page?user_id={{userid}}">Graphs</a>
         <a href="/load_charts_page?user_id={{userid}}">Charts</a>
         {% if role == 'User' %}
-            <form action="/signout" method="GET, POST">
-                <button type="submit" class="btn btn-primary">Logout</button>
-            </form>
+            <a href="/signout">Logout</a>
         {% else %}
             <a href="/lifecoach/dashboard">Back</a>
         {% endif %}

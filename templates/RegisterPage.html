@@ -10,23 +10,22 @@
 <body>
     <div class="main">
         <input type="checkbox" id="chk" aria-hidden="true">
-        <div class="signup">
-            <form action="/register" method="post" class="signup">
+            <form class="signup" method="post" onsubmit="registerUser(event)">
                 <label class="label headers" for="chk" aria-hidden="true">Register</label>
                 <label class="label fields">Username</label>
-                <input class="input" type="text" name="username" placeholder="Enter a username" required>
+                <input class="input" type="text" name="username" id="username" maxlength="20" placeholder="Enter a username" required oninput="checkUsername(event)">
                 <label class="label fields">Password</label>
-                <input class="input" type="password" name="password" placeholder="Enter a password" required="">
+                <input class="input" type="password" name="password" id="password" placeholder="Enter a password" required oninput="checkPassword(event)">
                 <label class="label fields" for="role">Role</label>
-                <select name="role" placeholder="Select a role" required="">
+                <select name="role" placeholder="Select a role" required>
                     <option value="" disabled selected>--Select a role--</option>
                     <option value="User">User</option>
                     <option value="LifeCoach">Life Coach</option>
                 </select>
                 <button type="submit">Register</button>
-            </form>  
+            </form>
             <a href="/">Back to Login</a>
-        </div>
     </div>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 </html>

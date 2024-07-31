@@ -7,7 +7,7 @@ body {
     align-items: center;
     min-height: 100vh;
     font-family: 'Jost', sans-serif;
-    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    background: linear-gradient(to bottom, #1a0c29, #552583, #30243e);
 }
 
 .main {
@@ -66,11 +66,29 @@ h1 {
 
 /*fields are only used on the register page*/
 .label.fields{
-    color:yellow;
+    color: #FDB927;
     position: relative;
     left: 60px;
 }
 
+.register-message{
+    /*justify-content: center;
+    display: flex;*/
+    text-align: center;
+    color: #FDB927;
+    margin-bottom: 30px;
+}
+
+.register-message a.register-link{
+    color: #FDB927;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline;
+}
+
+.register-message a.register-link:hover{
+    text-decoration: underline;
+}
 /*input fields on register page have rounded corners, input fields on login page do not*/
 .input {
     width: 60%;

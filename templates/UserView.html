@@ -33,64 +33,67 @@
     <div class="" id="home">
         <div class="container">
             <!-- row -->
-            <div class="row tm-content-row tm-mt-big">
-                <div class="tm-col tm-col-big">
-                    <div class="bg-white tm-block h-100">
+            <div class="tm-content-row">
+                <div class="dash-col">
+                    <div class="bg-white">
                         <h2 class="tm-block-title">Habits</h2>
                         <!--------------------------- HABITS --------------------------->
                         <div class="habit-list">
                             {% for habit in habits %}
-                            <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
-                                <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
-                                <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
-                                <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
-                                <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
-                            </form>
+                                <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
+                                    <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+                                    <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
+                                    <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
+                                    <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
+                                </form>
                             {% endfor %}
                         </div>
-                        <canvas id="barChart"></canvas>
                         <!--button for managing habits-->
                         <form id="manage-habit-form" method="POST" action="/managehabits">
                             <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
                             <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
-                            <button type="submit" class="btn btn-primary">Manage Habits</button>
+                            <button type="submit" class="button">Manage Habits</button>
                         </form>                                               
                     </div>
                 </div>
-                <div class="tm-col tm-col-big">
-                    <div class="bg-white tm-block h-100">
+                <div class="dash-col">
+                    <div class="bg-white">
                         <h2 class="tm-block-title">Macro Tracker</h2>
                         <!--------------------------- MACROS --------------------------->
                         <div id="macros">
                             <form id="macrosForm" onsubmit="logMacros(event)">
-                                <!-- Hidden input field to store the user_id -->
-                                <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
-                
-                                <!-- Existing input fields for macros -->
-                                <label for="caloriesInput">Calories:</label>
-                                <input type="number" id="caloriesInput" name="caloriesInput" required>
-                                <br>
-                                <label for="proteinInput">Protein (grams):</label>
-                                <input type="number" id="proteinInput" name="proteinInput" required>
-                                <br>
-                                <label for="carbsInput">Carbohydrates (grams):</label>
-                                <input type="number" id="carbsInput" name="carbsInput" required>
-                                <br>
-                                <label for="fatsInput">Fats (grams):</label>
-                                <input type="number" id="fatsInput" name="fatsInput" required>
-                                <br>
-                                <label for="weightInput">Current Weight (lbs):</label>
-                                <input type="number" id="weightInput" name="weightInput" required>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Log Macros</button>
+                                <div class="macros-container">
+                                    <!-- Hidden input field to store the user_id -->
+                                    <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
+                                    <!-- Existing input fields for macros -->
+                                    <label for="caloriesInput">Calories</label>
+                                    <br>
+                                    <input type="number" id="caloriesInput" name="caloriesInput" placeholder="Enter calories" required>
+                                    <br>
+                                    <label for="proteinInput">Protein</label>
+                                    <br>
+                                    <input type="number" id="proteinInput" name="proteinInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="carbsInput">Carbohydrates</label>
+                                    <br>
+                                    <input type="number" id="carbsInput" name="carbsInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="fatsInput">Fats</label>
+                                    <br>
+                                    <input type="number" id="fatsInput" name="fatsInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="weightInput">Current Weight</label>
+                                    <br>
+                                    <input type="number" id="weightInput" name="weightInput" placeholder="Enter pounds (lbs)" required>
+                                </div>
+                                <button type="submit" class="button">Log Macros</button>
                             </form>
                         </div>
-                        <canvas id="lineChart"></canvas>
                     </div>
                 </div>
             
-                <div class="tm-col tm-col-big">
-                    <div class="bg-white tm-block h-100">
+                <div class="dash-col">
+                    <div class="bg-white">
                         <h2 class="tm-block-title">You are viewing {{ user_username }}'s dashboard!</h2>
                     </div>                    
                 </div>

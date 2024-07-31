@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Copperplate+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!--to use font awesome icons-->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="dashboard.css">
 
@@ -23,9 +24,7 @@
         <a href="/go_home">Dashboard</a>
         <a href="/load_graphs_page?user_id={{userid}}">Graphs</a>
         <a href="/load_charts_page?user_id={{userid}}">Charts</a>
-        <form action="/signout" method="GET, POST">
-            <button type="submit" class="btn btn-primary">Logout</button>
-        </form>
+        <a href="/signout">Logout</a>
     </div>
     <div id="tm-col" style="text-align: center;">
         <button onclick="previousDate()">◀</button>
@@ -36,86 +35,97 @@
         <div class="container">
             <!-- row -->
             <div class="tm-content-row">
-                <div class="tm-col">
+                <div class="dash-col">
                     <div class="bg-white">
                         <h2 class="tm-block-title">Habits</h2>
                         <!--------------------------- HABITS --------------------------->
                         <div class="habit-list">
-                            {% for habit in habits %}
-                                <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
-                                    <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
-                                    <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
-                                    <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
-                                    <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
-                                </form>
-                            {% endfor %}
+                            {% if habits %}
+                                {% for habit in habits %}
+                                    <form id="habitForm_{{ habit.habit_id }}" onchange="checkBox(event, this)">
+                                        <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+                                        <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
+                                        <input type="checkbox" id="habit_{{ habit.habit_id }}" name="completed" value="True" {% if completions.get(habit.habit_id) %} checked {% endif %}>
+                                        <label class="habit-description" for="habit_{{ habit.habit_id }}">{{ habit.habit_description }}</label>
+                                    </form>
+                                {% endfor %}
+                            {% else %}
+                                <p class="message">You have no habits today!</p>
+                            {% endif %}
                         </div>
-                        <canvas id="barChart"></canvas>
                         <!--button for managing habits-->
                         <form id="manage-habit-form" method="POST" action="/managehabits">
                             <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
                             <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
-                            <button type="submit" class="btn btn-primary">Manage Habits</button>
+                            <button type="submit" class="button">Manage Habits</button>
                         </form>
                     </div>
                 </div>
-                <div class="tm-col">
+                <div class="dash-col">
                     <div class="bg-white">
                         <h2 class="tm-block-title">Macro Tracker</h2>
                         <!--------------------------- MACROS --------------------------->
                         <div id="macros">
                             <form id="macrosForm" onsubmit="logMacros(event)">
-                                <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
-                                <label for="caloriesInput">Calories:</label>
-                                <input type="number" id="caloriesInput" name="caloriesInput" required>
-                                <br>
-                                <label for="proteinInput">Protein (grams):</label>
-                                <input type="number" id="proteinInput" name="proteinInput" required>
-                                <br>
-                                <label for="carbsInput">Carbohydrates (grams):</label>
-                                <input type="number" id="carbsInput" name="carbsInput" required>
-                                <br>
-                                <label for="fatsInput">Fats (grams):</label>
-                                <input type="number" id="fatsInput" name="fatsInput" required>
-                                <br>
-                                <label for="weightInput">Current Weight (lbs):</label>
-                                <input type="number" id="weightInput" name="weightInput" required>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Log Macros</button>
+                                <div class="macros-container">
+                                    <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+                                    <label for="caloriesInput">Calories</label>
+                                    <br>
+                                    <input type="number" id="caloriesInput" name="caloriesInput" placeholder="Enter calories" required>
+                                    <br>
+                                    <label for="proteinInput">Protein</label>
+                                    <br>
+                                    <input type="number" id="proteinInput" name="proteinInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="carbsInput">Carbohydrates</label>
+                                    <br>
+                                    <input type="number" id="carbsInput" name="carbsInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="fatsInput">Fats</label>
+                                    <br>
+                                    <input type="number" id="fatsInput" name="fatsInput" placeholder="Enter grams" required>
+                                    <br>
+                                    <label for="weightInput">Current Weight</label>
+                                    <br>
+                                    <input type="number" id="weightInput" name="weightInput" placeholder="Enter pounds (lbs)" required>
+                                </div>
+                                <button type="submit" class="button">Log Macros</button>
                             </form>
                         </div>
-                        <canvas id="lineChart"></canvas>
                     </div>
-                    
                 </div>
-                <div class="tm-col">
+                <div class="dash-col">
                     <div class="bg-white">
                         <h2 class="tm-block-title">Welcome, {{ username }}!</h2>
                         <div id="connected-coach">
                             {% if connected_coach %}
-                                <p style="color: black;">Your coach is {{ connected_coach.username }}</p>
+                                <p class="message">Your coach is {{ connected_coach.username }}</label>
                             {% else %}
-                                <p style="color: black;">You have no coach</p>
+                                <p class="message">You have no coach</label>
                             {% endif %}
                         </div>
                     </div>                    
-                    <div class="tm-col">
-                        <div class="bg-white">
-                            <h2 class="tm-block-title">Life Coach Search</h2>
-                            <div id="coach-container">
-                                {% if connected_coach %}
-                                    <label style="color: black;">{{ connected_coach.username }}</label>
-                                    <button type="button" onclick="removeCoach('{{ userid }}', event)">Remove</button>
-                                {% elif request.rel_status == 'pending' %}
-                                    <label style="color: black;">{{requested_coach.username}}</label>
-                                    <button type="button" onclick="removeCoach('{{ userid }}', event)">Cancel Request</button>
-                                {% else %}
-                                    <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
-                                        <input type="text" id="coach_name" name="coach_name" required>
-                                        <button type="submit" class="btn btn-primary">Search</button>
-                                    </form>
-                                {% endif %}
-                            </div>
+                    <div class="bg-white">
+                        <h2 class="tm-block-title">Life Coach Search</h2>
+                        <div id="coach-container">
+                            {% if connected_coach %}
+                                <label style="color: black;">{{ connected_coach.username }}</label>
+                                <button type="button" class="button negative" onclick="removeCoach('{{ userid }}', event)">&times Remove</button>
+                            {% elif request.rel_status == 'pending' %}
+                                <label style="color: black;">{{requested_coach.username}}</label>
+                                <button type="button" class="button negative" onclick="removeCoach('{{ userid }}', event)">&times Cancel Request</button>
+                            {% else %}
+                                <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                                    <div class="search-container">
+                                        <!--<input type="text" id="coach_name" name="coach_name" placeholder="Search by username" required>
+                                        <button type="submit" class="btn btn-primary">Search</button>-->
+                                        <input type="text" id="coach_name" name="coach_name" class="search-input" placeholder="Search by username" required>
+                                        <button type="submit" class="search-button">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/490px-Magnifying_glass_icon.svg.png" alt="Search">
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

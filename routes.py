@@ -20,21 +20,22 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         existingUser = User.query.filter_by(username=username).first()
-
+        #if the username and password match up, load the user's dashboard for the current date
         if existingUser and bcrypt.check_password_hash(existingUser.password, password):
             session['username'] = existingUser.username
             session['userid'] = existingUser.id 
             session['role'] = existingUser.role
             session['current_date'] = date.today()
-
-            if existingUser.role == 'Admin':
-                return redirect(url_for('admin_dashboard'))  
-            elif existingUser.role == 'LifeCoach':
-                return redirect(url_for('lifecoach_dashboard'))  
+ 
+            if existingUser.role == 'LifeCoach':
+                #return redirect(url_for('lifecoach_dashboard'))  
+                return jsonify({'user': False})
             else:
-                return redirect(url_for('user_dashboard'))
+                #return redirect(url_for('user_dashboard'))
+                return jsonify({'user': True})
+        #if the username and password do not match up
         else:
-            flash('Invalid username or password')
+            return jsonify({'failure': True})
 
     return render_template('LoginPage.html')
 
@@ -95,12 +96,14 @@ def register():
     password = request.form.get('password')
     role = request.form.get('role')
 
-    #This calls the service for create user
-    newUser = UserService.create_user(username, password, role)
-
-    db.session.add(newUser)
-    db.session.commit()
-    return render_template('LoginPage.html')
+    #if the user with the entered username exists, do not add to datbase
+    existingUser = UserService.get_user(username=username)
+    if existingUser:
+        return jsonify({'success': False})
+    else:
+    #else, create the user and add to db
+        UserService.create_user(username, password, role)
+        return jsonify({'success': True})
 
 # ------------------------------ ADMIN ROUTES --------------------------------------------
 
@@ -158,7 +161,7 @@ def create_user():
     password = request.form.get('password')
     role = request.form.get('role')
 
-    newUser = UserService.create_user(username, password, role)
+    UserService.create_user(username, password, role)
 
     return redirect(url_for('admin_dashboard'))
 
@@ -330,7 +333,7 @@ def send_request():
             'id': coach.id,
             'username': coach.username
         }
-        return jsonify({'success': True, 'coach_data': coach_data})
+        return jsonify({'success': True, 'coach_data': coach_data, 'user_id': user_id})
     else:
         return jsonify({'success': False})
     

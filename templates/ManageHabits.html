@@ -6,54 +6,62 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Copperplate+Gothic&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
     <link rel="stylesheet" href="dashboard.css">
 
 </head>
 <body id="managementPage">
     <div id="header-bar">
-        <form id="go-back-form" method="POST" action="/go_home?user_id={{userid}}">
+        <!--<form id="go-back-form" method="POST" action="/go_home?user_id={{userid}}">
             <button type="submit" style="position:absolute; top:20px; left:20px;">Back</button>
-        </form>
+        </form>-->
+        <a href="/go_home?user_id={{userid}}" class="back-link"><i class="fa-solid fa-circle-arrow-left"></i> Back</a>
         <h1>Macrominder</h1>
     </div>
     <div class="bg-white tm-block h-100">
         <h2 class="tm-block-title">Habits</h2>
         <!--------------------------- HABITS --------------------------->
-        <div id="habit-list">
-            {% for habit in habits %}
-                <form id="habitForm_{{ habit.habit_id }}">
-                    <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
-                    <!--the input only shows up when you click the description and makeEditable is called-->
-                    <label class="habit-description" for="habit_{{ habit.habit_id }}" onclick="makeEditable(this)">{{ habit.habit_description }}</label>
-                    <input type="text" class="habit-input" style="display: none;" onblur="saveText(this)" onkeydown="handleKeyPress(event, this)">
-                    <div class="checkbox-container">
-                        <!--created an array of labels and put each element next to each checkbox-->
-                        {% set labels = ["Daily", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] %}
-                        {% set days = ["", "sun", "mon", "tues", "wed", "thurs", "fri", "sat"] %} <!--helps identify the days columns in Habits table-->
-                        {% set all_days_checked = habit.sun and habit.mon and habit.tues and habit.wed and habit.thurs and habit.fri and habit.sat %} <!--checks if all the days are true-->
-                        {% for i in range(8) %}
-                            <input type="checkbox" id="habit_{{ habit.habit_id }}_checkbox_{{ i }}" name="habit_{{ habit.habit_id }}_checkbox_{{ i }}" class="day-checkbox"
-                            {% if i==0 %}
-                                onclick="toggleCheckboxes('{{ habit.habit_id }}')"
-                                {% if all_days_checked %} checked {% endif %}
-                            {% else %} onchange="updateDailyCheckbox('{{ habit.habit_id }}')"
-                            {% endif %}
-                            {% if i > 0 and getattr(habit, days[i]) %} checked {% endif %}> <!--if the attribute (T/F) of a column (days[i]) is true, check the box-->
-                            <label class="day" for="habit_{{ habit.habit_id }}_checkbox_{{ i }}">{{ labels[i] }}</label>
-                        {% endfor %}
-                    </div>
-                    <button type="button" onclick="deleteHabit('{{ habit.habit_id }}', event)">Delete</button>
-                </form>
-            {% endfor %}
+        <div class="habit-list editable">
+            {% if habits %}
+                {% for habit in habits %}
+                    <form id="habitForm_{{ habit.habit_id }}">
+                        <input type="hidden" name="habit_id" value="{{ habit.habit_id }}">
+                        <!--the input only shows up when you click the description and makeEditable is called-->
+                        <label class="habit-description" for="habit_{{ habit.habit_id }}" onclick="makeEditable(this)">{{ habit.habit_description }}</label>
+                        <input type="text" class="habit-input" style="display: none;" onblur="saveText(this)" onkeydown="handleKeyPress(event, this)">
+                        <div class="checkbox-container">
+                            <!--created an array of labels and put each element next to each checkbox-->
+                            {% set labels = ["Daily", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] %}
+                            {% set days = ["", "sun", "mon", "tues", "wed", "thurs", "fri", "sat"] %} <!--helps identify the days columns in Habits table-->
+                            {% set all_days_checked = habit.sun and habit.mon and habit.tues and habit.wed and habit.thurs and habit.fri and habit.sat %} <!--checks if all the days are true-->
+                            {% for i in range(8) %}
+                                <input type="checkbox" id="habit_{{ habit.habit_id }}_checkbox_{{ i }}" name="habit_{{ habit.habit_id }}_checkbox_{{ i }}" class="day-checkbox"
+                                {% if i==0 %}
+                                    onclick="toggleCheckboxes('{{ habit.habit_id }}')"
+                                    {% if all_days_checked %} checked {% endif %}
+                                {% else %} onchange="updateDailyCheckbox('{{ habit.habit_id }}')"
+                                {% endif %}
+                                {% if i > 0 and getattr(habit, days[i]) %} checked {% endif %}> <!--if the attribute (T/F) of a column (days[i]) is true, check the box-->
+                                <label class="day" for="habit_{{ habit.habit_id }}_checkbox_{{ i }}">{{ labels[i] }}</label>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="button negative" onclick="deleteHabit('{{ habit.habit_id }}', event)">&times Delete</button>
+                    </form>
+                {% endfor %}
+            {% else %}
+                <p class="message">You have no habits.</p>
+            {% endif %}
         </div>
             <form id="add-habit-form" method="POST" onsubmit="addHabit(event)">
-                <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
-                <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
-                <input type="text" id="habitdesc" name="habitdesc" required>
-                <button type="submit" class="btn btn-primary">Add Habit</button>
+                <div class="search-container">
+                    <!--fix: the hidden input represents user_id; send this to ManageHabits.html-->
+                    <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+                    <input type="text" class="add-habit-input" id="habitdesc" name="habitdesc" maxlength="20" placeholder="Enter habit name" required>
+                    <button type="submit" class="add-habit-button"><i class="fa-solid fa-square-plus"></i></button>
+                </div>
             </form>
-            <button type="button" onclick="applyChanges()">Apply Changes</button>
+            <button type="button" class="button" onclick="applyChanges()">Apply Changes</button>
     </div>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>

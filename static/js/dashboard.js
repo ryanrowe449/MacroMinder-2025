@@ -10,7 +10,11 @@ function addHabit(event){
         .then(response => response.json())
         .then(data => {
             if (data.success){
-                const habitsList = document.getElementById('habit-list');
+                /*remove the message if it's there*/
+                const habitsList = document.querySelector('.habit-list.editable'); //query selector selects the first element that matches the CSS
+                if (habitsList.textContent.includes('You have no habits.')) {
+                    habitsList.innerHTML = '';
+                }
                 const newHabit = `
                 <form id="habitForm_${data.habit_id}">
                     <input type="hidden" name="habit_id" value="${data.habit_id}">
@@ -23,10 +27,9 @@ function addHabit(event){
                             <label class="day" for="habit_${data.habit_id}_checkbox_${i}">${label}</label>
                             `).join('')}
                     </div>
-                    <button type="button" onclick="deleteHabit('${data.habit_id}', event)">Delete</button>
+                    <button type="button" class="button negative" onclick="deleteHabit('${data.habit_id}', event)">&times Delete</button>
                 </form>
                 `;
-                //habitsList.insertAdjacentHTML('beforeend', newHabit);
                 habitsList.innerHTML += newHabit;
                 form.reset();
             }
@@ -53,6 +56,13 @@ function deleteHabit(habitId, event) {
                 console.log('Habit deleted');
                 const habitElement = document.getElementById(`habitForm_${habitId}`);
                 habitElement.parentNode.removeChild(habitElement);
+                /*check if there are any habits left. If not, replace it with a message*/
+                const habitContainer = document.querySelector('.habit-list.editable');
+                const habitLabels = habitContainer.getElementsByTagName('label');
+                if (habitLabels.length == 0){
+                    const message = `<p class="message">You have no habits.</p>`;
+                    habitContainer.innerHTML = message;
+                }
             } else {
                 alert('Failed to delete habit');
             }
@@ -64,7 +74,7 @@ function deleteHabit(habitId, event) {
 
 //function to apply the changes a user has made to habits
 async function applyChanges() {
-    const forms = document.querySelectorAll('#habit-list form[id^="habitForm_"]'); //gets each individual habit form, use # to get by id
+    const forms = document.querySelectorAll('.habit-list.editable form[id^="habitForm_"]'); //gets each individual habit form, use # to get by id
     const changes = [];
     const userId = document.getElementById('user_id').value;
 
@@ -205,10 +215,16 @@ function removeCoach(user_id, event){
                 connectedCoach.innerHTML = connCoach;
                 //replace with search form
                 const searchFormHtml = `
-                    <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
-                        <input type="text" id="coach_name" name="coach_name" required>
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </form>
+                        <form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
+                            <div class="search-container">
+                                <!--<input type="text" id="coach_name" name="coach_name" placeholder="Search by username" required>
+                                <button type="submit" class="btn btn-primary">Search</button>-->
+                                <input type="text" id="coach_name" name="coach_name" class="search-input" placeholder="Search by username" required>
+                                <button type="submit" class="search-button">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/490px-Magnifying_glass_icon.svg.png" alt="Search">
+                                </button>
+                            </div>
+                        </form>
                 `;
                 coachContainer.innerHTML = searchFormHtml;
             } else {
@@ -236,19 +252,31 @@ function searchCoach(event){
                 const coachContainer = document.getElementById('coach-container');
                 coachContainer.innerHTML = '';
                 const coachInfo = `<form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
-                                        <input type="text" id="coach_name" name="coach_name" required>
-                                        <button type="submit" class="btn btn-primary">Search</button>
+                                    <div class="search-container">
+                                        <!--<input type="text" id="coach_name" name="coach_name" placeholder="Search by username" required>
+                                        <button type="submit" class="btn btn-primary">Search</button>-->
+                                        <input type="text" id="coach_name" name="coach_name" class="search-input" placeholder="Search by username" required>
+                                        <button type="submit" class="search-button">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/490px-Magnifying_glass_icon.svg.png" alt="Search">
+                                        </button>
+                                    </div>
                                     </form>
                                     <label style="color: black;">${coach.username}</label>
-                                    <button type="button" onclick="sendRequest('${ coach.id }', event)">Request</button>`;
+                                    <button type="button" class="button positive" onclick="sendRequest('${ coach.id }', event)">Request <i class="fa-solid fa-paper-plane"></i></button>`;
                 coachContainer.innerHTML = coachInfo
             }
             else{
                 const coachContainer = document.getElementById('coach-container');
                 coachContainer.innerHTML = '';
                 const message = `<form id="search-coach-form" method="POST" onsubmit="searchCoach(event)">
-                                    <input type="text" id="coach_name" name="coach_name" required>
-                                    <button type="submit" class="btn btn-primary">Search</button>
+                                    <div class="search-container">
+                                        <!--<input type="text" id="coach_name" name="coach_name" placeholder="Search by username" required>
+                                        <button type="submit" class="btn btn-primary">Search</button>-->
+                                        <input type="text" id="coach_name" name="coach_name" class="search-input" placeholder="Search by username" required>
+                                        <button type="submit" class="search-button">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Magnifying_glass_icon.svg/490px-Magnifying_glass_icon.svg.png" alt="Search">
+                                        </button>
+                                    </div>
                                 </form>
                                 <p style="color: black;">No coaches found</p>`
                                 ;
@@ -270,6 +298,7 @@ function sendRequest(coach_id, event){
         .then(data => {
             if (data.success) {
                 const coach = data.coach_data;
+                const user_id = data.user_id;
                 //get the content of coach containers
                 const coachContainer = document.getElementById('coach-container');
                 //remove current content
@@ -277,7 +306,7 @@ function sendRequest(coach_id, event){
                 //replace with request
                 const requestFormHtml = `
                     <label style="color: black;">${coach.username}</label>
-                    <button type="button" onclick="removeCoach('${ coach.id }', event)">Cancel Request</button>
+                    <button type="button" class="button negative" onclick="removeCoach('${ user_id }', event)">&times Cancel Request</button>
                 `;
                 coachContainer.innerHTML = requestFormHtml;
             } else {
@@ -321,8 +350,8 @@ function acceptRequest(user_id, event){
                 const newClient = `
                         <form action="/viewuser/${user_id}" method="GET">
                             <label style="color: black;">${data.username}</label>
-                            <button type="submit" class="btn btn-primary">View User</button>
-                            <button type="button" onclick="deleteClient('${ user_id }', event)">Delete</button>
+                            <button type="submit" class="button">View User</button>
+                            <button type="button" class="button negative" onclick="deleteClient('${ user_id }', event)">Delete</button>
                         </form>
                     `;
                 clientsContainer.innerHTML += newClient;
@@ -486,5 +515,75 @@ function toggleMenu() {
     } else {
         menu.style.width = "0";
         mainContent.style.marginLeft = "0";
+    }
+}
+
+//function called when a user presses 'register'
+function registerUser(event){
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    fetch('/register', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success){
+                alert('Account created successfully! Now, you may log in');
+                window.location.href = '/';
+            }
+            else{
+                alert('This username already exists. Try a different username');
+            }
+        })
+}
+
+//function to log user in
+function login(event){
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    fetch('/', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.failure){
+                alert('Username or Password is incorrect');
+            }
+            else if(data.user){
+                window.location.href = '/user/dashboard';
+            }
+            else{
+                window.location.href = '/lifecoach/dashboard';
+            }
+        })
+}
+
+//function used to make sure the user is entering the right characters for username on the register page
+function checkUsername(event){
+    const username = document.getElementById("username");
+    //pattern includes any letter, any number, and underscores. nothing else is allowed
+    const pattern = /^[A-Za-z0-9_]+$/;
+    if (!pattern.test(username.value)){
+        username.setCustomValidity("Username can only contain letters, numbers, and underscores."); //setting the error message
+    }
+    else{
+        username.setCustomValidity("");
+    }
+}
+
+//function used to make sure the user is entering the right characters for password on the register page
+function checkPassword(event){
+    const password = document.getElementById("password");
+    //pattern includes any character excluding spaces
+    const pattern = /^[^ ]+$/;
+    if (!pattern.test(password.value)){
+        password.setCustomValidity("Password cannot contain spaces."); //setting the error message
+    }
+    else{
+        password.setCustomValidity("");
     }
 }

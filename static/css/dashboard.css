@@ -1,9 +1,8 @@
-/* Dashboard Body old color #302c64 */
 body {
     font-family: "Open Sans", Helvetica, Arial, sans-serif;
     overflow-x: hidden;
     color: #ffffff;
-    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
+    background: linear-gradient(to bottom, #1a0c29, #552583, #30243e);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -20,6 +19,70 @@ h1 {
                   2px  2px 0 #000;
 }
 
+/*default yellow button that changes color when hovered
+over and goes down/right when clicked*/
+.button{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: #FDB927;
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px black;
+    cursor: pointer;
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.2);
+    transition-duration: 0.4s;
+}
+
+.button:hover{
+    background-color: #ffd272;
+}
+
+.button:active{
+    transform: translate(4px, 4px);
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+    background-color: #ffd272;
+}
+
+/*button used to do negative things (cancel, delete)*/
+.button.negative{
+    background-color: rgb(255, 72, 0);
+}
+
+.button.negative:hover{
+    background-color: rgba(255, 72, 0, 0.451);
+}
+
+/*button used to do positive things*/
+.button.positive{
+    margin-top: 5px;
+    background-color: rgb(3, 204, 3);
+}
+
+.button.positive:hover{
+    background-color: rgb(2, 231, 2);
+}
+
+.button.logout{
+    background-color: rgb(72, 72, 228);
+    color: rgba(255, 255, 255, 0.774);
+    margin-top: 7px;
+    box-shadow: none;
+    transition-duration: 0.4s;
+}
+
+.button.logout:hover{
+    background-color: rgb(92, 92, 247);
+}
+
+.button.logout:active{
+    transform: none;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+}
+
+.message{
+    color: black;
+}
 /* Header */
 #header-bar {
     color: #ffffff;
@@ -56,30 +119,26 @@ h1 {
     margin-top: 20px;
 }
 
-.tm-col {
-    flex: 1 1 auto;
-    max-width: 400px;
+/*dashboard columns, all take up the same portion of space*/
+.dash-col {
+    flex: 1;
 }
 
-.extended-col {
+/*columns used for other purposes*/
+.tm-col {
     flex: 1 1 auto;
     max-width: 500px;
     margin-left: 20px;
 }
 
-.extended-col-big {
-    max-width: 1000px;
-    margin-left: 20px;
-}
-
 /* Blocks */
 .bg-white {
-    background-color: rgba(255, 255, 255, 0.8);;
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 20px;
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
     border: 1.5px solid black;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
 }
 
 .tm-block-title {
@@ -90,12 +149,17 @@ h1 {
     margin-bottom: 10px;
 }
 
-/* Habit Button */
-.habit-button {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    padding: 5px 10px;
+/*container for the habits on dashboard*/
+.habit-list {
+    flex: 1;
+    height: 240px;
+    overflow-y: auto; /*if there are too many habits, add a scroll bar*/
+    margin-bottom: 20px; /* Space between the habit list and the button */
+}
+
+/*container for the habits on manage habits*/
+.habit-list.editable{
+    height: 300px;
 }
 
 .habit-description {
@@ -106,19 +170,20 @@ h1 {
     color: black;
 }
 
-/* Adjust text color */
+/*styling for macros section*/
 #macros label {
     color: black;
+    font-size: 14.5px;
 }
 
-/* Adjust input width */
 #macros input[type="number"] {
-    width: 80px;
+    width: 125px;
+    margin-bottom: 6px;
 }
 
-/* Adjust button */
-#macros button {
-    margin-top: 10px;
+#macros .button {
+    margin-top: 2px;
+    /*margin: auto;*/
 }
 
 #macroDisplay {
@@ -126,36 +191,9 @@ h1 {
 }
 
 #macros .macros-container {
-    margin-bottom: 20px;
-}
-
-/* Habit Header */
-#habits-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-#habits-header button {
-    background: transparent;
-    color: black;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.life-coach-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.tm-life-coach-block {
-    width: 150px;
-    height: 300px;
-    position: absolute;
-    top: 200px;
-    right: 120px;
+    flex: 1;
+    height: 240px;
+    margin-bottom: 23px;
 }
 
 #currentDate {
@@ -164,14 +202,6 @@ h1 {
     margin: 0 15px;
 }
 
-.macro_graph {
-    background-color: rgba(255, 255, 255, 0.8);;
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.8);
-    border: 1.5px solid black;
-    margin-bottom: 10px; 
-}
 /*styling for the sliding menu*/
 .menu {
     height: 100%;
@@ -223,6 +253,11 @@ h1 {
     background-color: #444;
 }
 
+.main-content {
+    transition: margin-left 0.5s;
+    padding: 16px;
+}
+
 /*graph container, allows graphs to be displayed on the same row*/
 .graph-container {
     display: flex;
@@ -231,18 +266,85 @@ h1 {
     gap: 20px; /* Optional: adds space between graphs */
 }
 
+/*coach search bar*/
+.search-container {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.search-input {
+    width: 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    /*border radius makes the left corners rounded and right corners not*/
+    border-radius: 4px 0px 0px 4px;
+    outline: none;
+    background-color: #ffffff;
+    font-size: 16px;
+}
+
+.search-button {
+    background-color: #FDB927;
+    border: none;
+    /*border radius makes the right corners rounded and left corners not*/
+    border-radius: 0px 4px 4px 0px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button img {
+    width: 20px;
+    height: 20px;
+}
+
+.add-habit-input {
+    width: 200px;
+    padding: 7px;
+    border: 1px solid #ccc;
+    /*border radius makes the left corners rounded and right corners not*/
+    border-radius: 4px 0px 0px 4px;
+    outline: none;
+    background-color: #ffffff;
+    font-size: 16px;
+}
+
+.add-habit-button {
+    font-size: 19px;
+    background-color: #FDB927;
+    border: none;
+    /*border radius makes the right corners rounded and left corners not*/
+    border-radius: 0px 4px 4px 0px;
+    padding: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-link{
+    color: white; /*font color*/
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.back-link:hover {
+    background-color: #FDB927; /* Background color on hover */
+}
+
+.graph-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px; /*adds space between graphs */
+}
+
 .graph-container .bg-white {
     flex: 1 1 45%; /* Adjusts the width of each graph, making them fit side by side */
     max-width: 45%;
-}
-
-.graph-col {
-    flex: 1;
-    max-width: calc(50% - 20px); /* Ensure columns fit within the container */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-}
-
-.main-content {
-    transition: margin-left 0.5s;
-    padding: 16px;
 }
