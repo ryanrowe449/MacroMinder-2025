@@ -77,8 +77,6 @@ def load_charts_page():
                            weekly_completions_bar=weekly_completions_bar, weekly_completions_pie=weekly_completions_pie, role=role)
 
 #route to log out of current account
-#Explaining the use of session here, it is a feature provided by flask that
-#essentially saves the 'current' users information to persist through multiple requests
 @app.route('/signout', methods=['POST','GET'])
 def logout():
     session.clear()  #remove all items from a session
@@ -104,66 +102,6 @@ def register():
     #else, create the user and add to db
         UserService.create_user(username, password, role)
         return jsonify({'success': True})
-
-# ------------------------------ ADMIN ROUTES --------------------------------------------
-
-#the admin dashboard, obtains a full list of users using the UserService function
-@app.route('/admin/dashboard')
-def admin_dashboard():
-    if session.get('role') != 'Admin':
-        return redirect(url_for('login'))
-    
-    users = UserService.list_users()
-
-    return render_template('AdminDashboard.html', users=users)
-
-#Admin functionality of the delete portion of crud, new simplified version to make things simpler.
-#this route uses multiple backend Services to delete a user, and all associated records in the db
-@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-def delete_user(user_id):
-    if session.get('role') != 'Admin':
-        return redirect(url_for('login'))
-    
-    HabitService.delete_all_user_habits(user_id)
-    
-    CompletionLogService.delete_all_user_completion_logs(user_id)
-
-    CoachingService.delete_link(user_id)
-    
-    success = UserService.delete_user(user_id)
-    
-    return redirect(url_for('admin_dashboard'))
-
-#Route takes in information from html of the new username,role,and password
-#passes that information to the update user UserService funtion
-@app.route('/admin/edit_user/<int:user_id>', methods=['POST'])
-def update_user(user_id):
-    if session.get('role') != 'Admin':
-        return redirect(url_for('login'))
-    
-    new_username = request.form.get('username')
-    new_role = request.form.get('role')
-    new_password = request.form.get('password')
-    
-    UserService.update_user(user_id, new_username, new_password, new_role)
-
-    return redirect(url_for('admin_dashboard'))
-
-
-#route for admin page that allows them to create users. 
-#same as edit, calls create user 
-@app.route('/admin/create_user', methods=['POST'])
-def create_user():
-    if session.get('role') != 'Admin':
-        return redirect(url_for('login'))
-    
-    username = request.form.get('username')
-    password = request.form.get('password')
-    role = request.form.get('role')
-
-    UserService.create_user(username, password, role)
-
-    return redirect(url_for('admin_dashboard'))
 
 # ---------------------------- USER ROUTES ----------------------------------------------
 
