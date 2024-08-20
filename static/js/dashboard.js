@@ -520,6 +520,10 @@ function toggleMenu() {
 
 //function called when a user presses 'register'
 function registerUser(event){
+    //replaces the register button's text with the loading animation
+    registerbutton = document.getElementById('registerbutton');
+    registerbutton.innerHTML = '<div class="loader"></div>';
+    registerbutton.disabled = true;
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
@@ -535,12 +539,20 @@ function registerUser(event){
             }
             else{
                 alert('This username already exists. Try a different username');
+                //get rid of loading animation
+                registerbutton.innerHTML = 'Register';
+                registerbutton.disabled = false;
             }
         })
 }
 
-//function to log user in
+//function to log user in and use loading animation
 function login(event){
+    //replace text in the button with loading animation and disable button
+    const loginbutton = document.getElementById('loginbutton');
+    loginbutton.innerHTML = '<div class="loader"></div>';
+    loginbutton.disabled = true;
+    //carry on with backend stuff
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
@@ -552,6 +564,8 @@ function login(event){
         .then(data => {
             if (data.failure){
                 alert('Username or Password is incorrect');
+                loginbutton.innerHTML = 'Login';
+                loginbutton.disabled = false;
             }
             else if(data.user){
                 window.location.href = '/user/dashboard';
