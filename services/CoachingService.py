@@ -1,5 +1,5 @@
 from models import User, CoachingGroups
-from app import db, bcrypt
+from application import db, bcrypt
 
 class CoachingService:
     #Query the database to get the list of users paired with the coach

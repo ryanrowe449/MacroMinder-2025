@@ -1,4 +1,4 @@
-from app import db
+from application import db
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import ForeignKey, Column, Integer, String, Boolean, Date
 #from sqlalchemy.ext.declarative import declarative_base

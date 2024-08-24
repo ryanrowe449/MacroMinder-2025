@@ -1,5 +1,5 @@
 from models import User, Habits
-from app import db
+from application import db
 import datetime
 from services.TimeService import TimeService
 from flask import request, session

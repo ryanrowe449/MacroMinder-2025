@@ -1,5 +1,5 @@
 from models import Habits
-from app import db
+from application import db
 from datetime import date, datetime, timedelta
 from flask import request, session
 

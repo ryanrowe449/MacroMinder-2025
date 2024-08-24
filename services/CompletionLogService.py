@@ -1,6 +1,6 @@
 from models import CompletionLog
 from models import User
-from app import db
+from application import db
 
 class CompletionLogService:
     

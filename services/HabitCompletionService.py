@@ -1,6 +1,6 @@
 from models import HabitCompletion, User, Habits
 from services.HabitService import HabitService
-from app import db
+from application import db
 
 class HabitCompletionService:
     #checks to see if a specific habit was completed on a specific date

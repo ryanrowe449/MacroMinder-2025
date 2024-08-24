@@ -1,5 +1,5 @@
-from flask import render_template, request, flash, session, redirect, url_for, jsonify
-from app import app, db, bcrypt
+from flask import render_template, request, session, redirect, url_for, jsonify
+from application import app, db, bcrypt
 from models import User, Habits, CompletionLog, CoachingGroups, HabitCompletion
 from services.UserService import UserService
 from services.HabitService import HabitService
@@ -323,7 +323,6 @@ def view_user(user_id):
     current_date = TimeService.parse_session_date(session_date)
     
     if not user:
-        flash('User not found.')
         return redirect(url_for('lifecoach_dashboard'))
     
     habits = HabitService.list_habits(user_id, current_date)

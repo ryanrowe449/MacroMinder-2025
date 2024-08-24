@@ -1,5 +1,5 @@
 from models import User, CoachingGroups
-from app import db, bcrypt
+from application import db, bcrypt
 from services.HabitService import HabitService
 from services.CompletionLogService import CompletionLogService
 
