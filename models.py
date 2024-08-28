@@ -42,7 +42,7 @@ class CompletionLog(db.Model):
     carbs = db.Column(db.Integer, default=0)
     fats = db.Column(db.Integer, default=0)
     calories = db.Column(db.Integer, default=0)
-    weightlbs = db.Column(db.DECIMAL(4, 2), default=150)
+    weightlbs = db.Column(db.DECIMAL(5, 2), default=150)
     user = relationship("User", backref="completionlogs") #gets all the logs linked to a user
 
 class HabitCompletion(db.Model):

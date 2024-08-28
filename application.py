@@ -2,15 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_socketio import SocketIO
-#import os
 
-#have to se the FLASK_APP environment variable
-#os.environ['FLASK_APP'] = 'application.py'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-# ALWAYS REPLACE THIS LINE WITH YOUR LOCAL DATABASE PATH - Ori
-# For example: mysql://username:password@localhost/TableName
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:monkeyinhospital@localhost/users'
+#mysql://username:password@localhost/TableName
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://ryanrowe:monkeyinhospital@rds-macro-minder-db.cj4wu2og693k.us-east-1.rds.amazonaws.com/macrominder'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 socketio = SocketIO(app)
