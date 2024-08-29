@@ -1,5 +1,5 @@
 from flask import render_template, request, session, redirect, url_for, jsonify
-from application import app, db, bcrypt
+from application import application, db, bcrypt
 from models import User, Habits, CompletionLog, CoachingGroups, HabitCompletion
 from services.UserService import UserService
 from services.HabitService import HabitService
@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 
 #route for login, it gets the username and password to verify the user
 #sets up all session id's and directs the user to the correct dashboard
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -40,7 +40,7 @@ def login():
     return render_template('LoginPage.html')
 
 #when clicking the back button in ManageHabits.html, loads the user/lifecoach dashboard
-@app.route('/go_home', methods=['GET', 'POST'])
+@application.route('/go_home', methods=['GET', 'POST'])
 def go_home():
     role = session.get('role')
     #if the logged-in user is a life coach, go back to the page of their client. If not, load the User's page
@@ -50,7 +50,7 @@ def go_home():
     elif role == 'User':
         return redirect(url_for('user_dashboard'))
     
-@app.route('/load_graphs_page')
+@application.route('/load_graphs_page')
 def load_graphs_page():
     user_id = request.args.get('user_id')
     weight_graph = GraphService.generate_weight_over_time_graph(user_id)
@@ -65,7 +65,7 @@ def load_graphs_page():
                            macros_graph=macros_graph, calories_graph=calories_graph, protein_graph=protein_graph,
                            carbs_graph=carbs_graph, fats_graph=fats_graph, role=role)
 
-@app.route('/load_charts_page')
+@application.route('/load_charts_page')
 def load_charts_page():
     user_id = request.args.get('user_id')
     habits_barchart = GraphService.generate_habit_progress_barchart(user_id)
@@ -77,18 +77,18 @@ def load_charts_page():
                            weekly_completions_bar=weekly_completions_bar, weekly_completions_pie=weekly_completions_pie, role=role)
 
 #route to log out of current account
-@app.route('/signout', methods=['POST','GET'])
+@application.route('/signout', methods=['POST','GET'])
 def logout():
     session.clear()  #remove all items from a session
     return redirect(url_for('login'))  #redirect to home page
 
 #Route to render registration page
-@app.route('/gotoregister', methods=['POST','GET'])
+@application.route('/gotoregister', methods=['POST','GET'])
 def goToRegister():
     return render_template('RegisterPage.html')
 
 #this route obtains the information to build a user, calls UserService to create a user
-@app.route('/register', methods=['POST'])
+@application.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username')
     password = request.form.get('password')
@@ -108,7 +108,7 @@ def register():
 #the main user dashboard, calls various service layer functions to obtain all required information
 #HabitService prints the habits for the session date, GraphService prints the graph corresponding
 #UserService prints the lifecoach and Coaching groups checks for any paired groups.
-@app.route('/user/dashboard')
+@application.route('/user/dashboard')
 def user_dashboard():
     userid = session.get('userid')
     username = session.get('username')
@@ -129,7 +129,7 @@ def user_dashboard():
                            requested_coach=requested_coach, completions=completions_dict)
 
 
-@app.route('/managehabits', methods=['POST'])
+@application.route('/managehabits', methods=['POST'])
 def manage_habits():
     #send the user's habits to managehabits.html
     userid = request.form.get('user_id')
@@ -137,7 +137,7 @@ def manage_habits():
     return render_template('ManageHabits.html', userid=userid, habits=habits, getattr=getattr) #have to add getattr=getattr to the template context so it can be used
 
 #just used for the managehabits page; this handles the event of a user changing the description/days of a habit
-@app.route('/updatehabits', methods=['POST'])
+@application.route('/updatehabits', methods=['POST'])
 def update_habits():
     if request.method == 'POST':
         data = request.json
@@ -170,7 +170,7 @@ def update_habits():
 
 #route to render the addhabit page or add a habit
 #called when a user clicks 'add' for a habit, takes the habit description and uses it to create a new habit for that date
-@app.route('/addhabit', methods=['POST','GET'])
+@application.route('/addhabit', methods=['POST','GET'])
 def addHabit():
     if request.method == 'POST':
         description = request.form.get('habitdesc')
@@ -188,7 +188,7 @@ def addHabit():
             return jsonify({'success': False, 'message': 'You must be logged in to add a habit.'})
 
 #called when a checkbox is clicked, stores/deletes a completion in habitcompletion
-@app.route('/checkbox', methods=['POST'])
+@application.route('/checkbox', methods=['POST'])
 def checkBox():
     user_id = request.form.get('user_id')
     habit_id = request.form.get('habit_id')
@@ -212,7 +212,7 @@ def checkBox():
         return jsonify({'success': False})
 
 #called when a user clicks edit habit, queries for the new description and edits the desired habit with HabitService
-@app.route('/edithabit', methods=['POST'])
+@application.route('/edithabit', methods=['POST'])
 def editHabit():
     habit_id = request.form.get('habit_id')
     new_description = request.form.get('new_description')
@@ -225,7 +225,7 @@ def editHabit():
         return jsonify({'success': False, 'message': 'Habit not found'})
 
 #called when a user clicks delete habit, passes info to HabitService
-@app.route('/deletehabit', methods=['POST'])
+@application.route('/deletehabit', methods=['POST'])
 def deleteHabit():
     #before deleting the habit, delete the completions related to the habit
     #have to delete completions before deleting habit, as delete_habit_completions requires that the habit exists
@@ -237,7 +237,7 @@ def deleteHabit():
     else:
         return jsonify({'success': False, 'message': 'Habit not found'})
     
-@app.route('/deletecoachinggroup', methods=['POST'])
+@application.route('/deletecoachinggroup', methods=['POST'])
 def delete_coaching_group():
     user_id = request.form.get('user_id')
     #user_id = session.get('userid')
@@ -247,7 +247,7 @@ def delete_coaching_group():
     else:
         return jsonify({'success': False})
     
-@app.route('/searchcoach', methods=['POST'])
+@application.route('/searchcoach', methods=['POST'])
 def search_coach():
     username = request.form.get('coach_name')
     coach = UserService.get_user(username=username, role='LifeCoach')
@@ -260,7 +260,7 @@ def search_coach():
     else:
         return jsonify({'success': False, 'message': 'Coach not found'})
     
-@app.route('/sendrequest', methods=['POST'])
+@application.route('/sendrequest', methods=['POST'])
 def send_request():
     user_id = session.get('userid')
     coach_id = request.form.get('coach_id')
@@ -276,7 +276,7 @@ def send_request():
         return jsonify({'success': False})
     
 #called when a user submits macro information, passes information to CompletionLogService
-@app.route('/addmacros', methods=['POST'])
+@application.route('/addmacros', methods=['POST'])
 def add_macros():
     # Add macro to the database
     #user_id = session.get('userid')
@@ -296,7 +296,7 @@ def add_macros():
 # ----------------------- LIFECOACH ROUTES ---------------------------------------
 
 #the main lifecoach dashbaors, uses Coachingservice to print out all paired users
-@app.route('/lifecoach/dashboard')
+@application.route('/lifecoach/dashboard')
 def lifecoach_dashboard():
     username = session.get('username')
     # Check lifecoach role
@@ -315,7 +315,7 @@ def lifecoach_dashboard():
 
 #the view of the users dashboard from a lifecoach view, prints everything a user might see from userdashboard
 #everything there applies here.
-@app.route('/viewuser/<int:user_id>', methods=['GET'])
+@application.route('/viewuser/<int:user_id>', methods=['GET'])
 def view_user(user_id):
     user = User.query.get(user_id)
     user_username = user.username
@@ -332,7 +332,7 @@ def view_user(user_id):
     # Render the UserView.html template with the user's information
     return render_template('UserView.html', user_id=user_id, habits=habits, current_date=current_date, user_username=user_username, completions=completions_dict)
 
-@app.route('/setcoachinggroup', methods=['POST'])
+@application.route('/setcoachinggroup', methods=['POST'])
 def set_coach():
     coach_id = session.get('userid')
     user_id = request.form.get('user_id')
@@ -344,13 +344,13 @@ def set_coach():
         return jsonify({'success': False})
         
 #sets the session id to the next date, using TimeService
-@app.route('/nextday', methods=['POST'])
+@application.route('/nextday', methods=['POST'])
 def next_day():
     TimeService.set_next_date()
     return jsonify({'success': True})
 
 #sets the session ID to the previous date, using TimeService
-@app.route('/prevday', methods=['POST'])
+@application.route('/prevday', methods=['POST'])
 def prev_day():
     TimeService.set_previous_date()
     return jsonify({'success': True})
