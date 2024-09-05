@@ -18,12 +18,19 @@ class GraphService:
             name='Habit Progress',
             marker_color='blue'
         ))
-
-        fig.update_layout(
-            title='Habit Completions Breakdown',
-            xaxis=dict(title='Habits'),
-            yaxis=dict(title='Total Completions'),
-        )
+        #if there are no completions, let the user know
+        if descriptions and count:
+            fig.update_layout(
+                title='Habit Completions Breakdown',
+                xaxis=dict(title='Habits'),
+                yaxis=dict(title='Total Completions'),
+            )
+        else:
+            fig.update_layout(
+                title='Habit Completions Breakdown (No Data to Display)',
+                xaxis=dict(title='Habits'),
+                yaxis=dict(title='Total Completions'),
+            )
 
         chart_html = fig.to_html(full_html=False)
         return chart_html
@@ -37,9 +44,14 @@ class GraphService:
             values=count,
             name='Habit Progress',
         ))
-        fig.update_layout(
-            title='Habit Completions Breakdown',
-        )
+        if descriptions and count:
+            fig.update_layout(
+                title='Habit Completions Breakdown',
+            )
+        else:
+            fig.update_layout(
+                title='Pie Chart (No Data to Display)',
+            )
         chart_html = fig.to_html(full_html=False)
         return chart_html
 
@@ -55,12 +67,18 @@ class GraphService:
         # Create the figure
         fig = go.Figure()
         fig.add_trace(go.Bar(x=list(completion_data.keys()), y=list(completion_data.values()), name='Completions'))
-
-        fig.update_layout(
-            title='Weekly Habit Completion Summary',
-            xaxis=dict(title='Day of the Week'),
-            yaxis=dict(title='Total Completions'),
-        )
+        if logs:
+            fig.update_layout(
+                title='Weekly Habit Completion Summary',
+                xaxis=dict(title='Day of the Week'),
+                yaxis=dict(title='Total Completions'),
+            )
+        else:
+            fig.update_layout(
+                title='Weekly Habit Completion Summary (No Data to Display)',
+                xaxis=dict(title='Day of the Week'),
+                yaxis=dict(title='Total Completions'),
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -82,9 +100,14 @@ class GraphService:
             name='Completions')
         )
 
-        fig.update_layout(
-            title='Weekly Habit Completion Summary'
-        )
+        if logs:
+            fig.update_layout(
+                title='Weekly Habit Completion Summary'
+            )
+        else:
+            fig.update_layout(
+                title='Pie Chart (No Data to Display)'
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -96,14 +119,23 @@ class GraphService:
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=weights, mode='lines', name='Weight'))
-
-        fig.update_layout(
-            title='Weight Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Weight (lbs)'),
-            height=500,
-            width=1060,
-        )
+        #check to see if there are more than two completions; if not, let the user know that no data is displayed
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Weight Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Weight (lbs)'),
+                height=500,
+                width=1060,
+            )
+        else:
+            fig.update_layout(
+                title='Weight Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Weight (lbs)'),
+                height=500,
+                width=1060,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -114,13 +146,22 @@ class GraphService:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=count, mode='lines', name='Habit Completion Count'))
 
-        fig.update_layout(
-            title='Habit Completions Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Habit Completions'),
-            height=500,
-            width=1060,
-        )
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Habit Completions Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Habit Completions'),
+                height=500,
+                width=1060,
+            )
+        else:
+            fig.update_layout(
+                title='Habit Completions Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Habit Completions'),
+                height=500,
+                width=1060,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -137,13 +178,22 @@ class GraphService:
         fig.add_trace(go.Scatter(x=dates, y=carbs, mode='lines', name='Carbs (g)'))
         fig.add_trace(go.Scatter(x=dates, y=fats, mode='lines', name='Fats (g)'))
 
-        fig.update_layout(
-            title='Macros Consumed Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Macros'),
-            height=500,
-            width=1060,
-        )
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Macros Consumed Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Macros'),
+                height=500,
+                width=1060,
+            )
+        else:
+            fig.update_layout(
+                title='Macros Consumed Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Macros'),
+                height=500,
+                width=1060,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -153,14 +203,23 @@ class GraphService:
         dates, cals = CompletionLogService.get_calories_data(user_id)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=cals, mode='lines', name='Calories'))
-
-        fig.update_layout(
-            title='Calories Consumed Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Calories'),
-            height=300,
-            width=450,
-        )
+        
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Calories Consumed Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Calories'),
+                height=300,
+                width=450,
+            )
+        else:
+            fig.update_layout(
+                title='Calories Consumed Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Calories'),
+                height=300,
+                width=450,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -171,13 +230,22 @@ class GraphService:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=protein, mode='lines', name='Protein'))
 
-        fig.update_layout(
-            title='Protein Consumed Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Protein (g)'),
-            height=300,
-            width=450,
-        )
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Protein Consumed Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Protein (g)'),
+                height=300,
+                width=450,
+            )
+        else:
+            fig.update_layout(
+                title='Protein Consumed Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Protein (g)'),
+                height=300,
+                width=450,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -187,14 +255,22 @@ class GraphService:
         dates, carbs = CompletionLogService.get_carbs_data(user_id)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=carbs, mode='lines', name='Protein'))
-
-        fig.update_layout(
-            title='Carbs Consumed Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Carbs (g)'),
-            height=300,
-            width=450,
-        )
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Carbs Consumed Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Carbs (g)'),
+                height=300,
+                width=450,
+            )
+        else:
+            fig.update_layout(
+                title='Carbs Consumed Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Carbs (g)'),
+                height=300,
+                width=450,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
@@ -204,14 +280,22 @@ class GraphService:
         dates, fats = CompletionLogService.get_fats_data(user_id)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dates, y=fats, mode='lines', name='Protein'))
-
-        fig.update_layout(
-            title='Fats Consumed Over Time',
-            xaxis=dict(title='Date'),
-            yaxis=dict(title='Fats (g)'),
-            height=300,
-            width=450,
-        )
+        if len(dates) >= 2:
+            fig.update_layout(
+                title='Fats Consumed Over Time',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Fats (g)'),
+                height=300,
+                width=450,
+            )
+        else:
+            fig.update_layout(
+                title='Fats Consumed Over Time (No Data to Display)',
+                xaxis=dict(title='Date'),
+                yaxis=dict(title='Fats (g)'),
+                height=300,
+                width=450,
+            )
 
         graph_html = fig.to_html(full_html=False)
         return graph_html
