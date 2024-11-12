@@ -488,13 +488,43 @@ async function logMacros(event) {
 
     const result = await response.json();
     if (result.success) {
-        console.log('Macros logged');
-        location.reload()
+        alert('Macros logged');
+        //grey out input fields
+        document.getElementById('proteinInput').disabled = true;
+        document.getElementById('carbsInput').disabled = true;
+        document.getElementById('fatsInput').disabled = true;
+        document.getElementById('caloriesInput').disabled = true;
+        document.getElementById('weightInput').disabled = true;
+
+        //change the button to "Edit Macros"
+        const logButton = document.getElementById('log-button');
+        logButton.textContent = "Edit Macros";
+        logButton.onclick = editLog;
+        //location.reload()
     } else {
         alert('Failed to log macros');
     }
-
     updateDate();
+}
+
+//function to allow user to edit a log, called when 'Edit Macros' is clicked
+function editLog(event) {
+    /*const log = JSON.parse(button.getAttribute('data-log'));
+    const userid = button.getAttribute('data-userid');
+    const event = window.event;*/
+    event.preventDefault();
+    
+    // Enable input fields for editing
+    document.getElementById('proteinInput').disabled = false;
+    document.getElementById('carbsInput').disabled = false;
+    document.getElementById('fatsInput').disabled = false;
+    document.getElementById('caloriesInput').disabled = false;
+    document.getElementById('weightInput').disabled = false;
+
+    // Change the button back to "Log Macros"
+    const logButton = document.getElementById('log-button');
+    logButton.textContent = "Log Macros";
+    logButton.onclick = logMacros;
 }
 
 function getCurrentDateString() {

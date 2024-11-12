@@ -68,28 +68,55 @@
                         <div id="macros">
                             <form id="macrosForm" onsubmit="logMacros(event)">
                                 <div class="macros-container">
-                                    <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
-                                    <label for="caloriesInput">Calories</label>
-                                    <br>
-                                    <input type="number" id="caloriesInput" name="caloriesInput" placeholder="Enter calories" required>
-                                    <br>
-                                    <label for="proteinInput">Protein</label>
-                                    <br>
-                                    <input type="number" id="proteinInput" name="proteinInput" placeholder="Enter grams" required>
-                                    <br>
-                                    <label for="carbsInput">Carbohydrates</label>
-                                    <br>
-                                    <input type="number" id="carbsInput" name="carbsInput" placeholder="Enter grams" required>
-                                    <br>
-                                    <label for="fatsInput">Fats</label>
-                                    <br>
-                                    <input type="number" id="fatsInput" name="fatsInput" placeholder="Enter grams" required>
-                                    <br>
-                                    <label for="weightInput">Current Weight</label>
-                                    <br>
-                                    <input type="number" id="weightInput" name="weightInput" placeholder="Enter pounds (lbs)" required>
+                                    {% if log %}
+                                        <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+                                        <label for="caloriesInput">Calories</label>
+                                        <br>
+                                        <input type="number" id="caloriesInput" name="caloriesInput" value="{{ log.calories }}" required disabled>
+                                        <br>
+                                        <label for="proteinInput">Protein</label>
+                                        <br>
+                                        <input type="number" id="proteinInput" name="proteinInput" value="{{ log.protein }}" required disabled>
+                                        <br>
+                                        <label for="carbsInput">Carbohydrates</label>
+                                        <br>
+                                        <input type="number" id="carbsInput" name="carbsInput" value="{{ log.carbs }}" required disabled>
+                                        <br>
+                                        <label for="fatsInput">Fats</label>
+                                        <br>
+                                        <input type="number" id="fatsInput" name="fatsInput" value="{{ log.fats }}" required disabled>
+                                        <br>
+                                        <label for="weightInput">Current Weight</label>
+                                        <br>
+                                        <input type="number" id="weightInput" name="weightInput" value="{{ log.weightlbs }}" required disabled>
+                                    {% else %}
+                                        <input type="hidden" id="user_id" name="user_id" value="{{ userid }}">
+                                        <label for="caloriesInput">Calories</label>
+                                        <br>
+                                        <input type="number" id="caloriesInput" name="caloriesInput" placeholder="Enter calories" required>
+                                        <br>
+                                        <label for="proteinInput">Protein</label>
+                                        <br>
+                                        <input type="number" id="proteinInput" name="proteinInput" placeholder="Enter grams" required>
+                                        <br>
+                                        <label for="carbsInput">Carbohydrates</label>
+                                        <br>
+                                        <input type="number" id="carbsInput" name="carbsInput" placeholder="Enter grams" required>
+                                        <br>
+                                        <label for="fatsInput">Fats</label>
+                                        <br>
+                                        <input type="number" id="fatsInput" name="fatsInput" placeholder="Enter grams" required>
+                                        <br>
+                                        <label for="weightInput">Current Weight</label>
+                                        <br>
+                                        <input type="number" id="weightInput" name="weightInput" placeholder="Enter pounds (lbs)" required>
+                                    {% endif %}
                                 </div>
-                                <button type="submit" class="button">Log Macros</button>
+                                {% if log %}
+                                    <button type="button" class="button" id="log-button" onclick="editLog(event)">Edit Macros</button>
+                                {% else %}
+                                    <button type="submit" class="button" id="log-button">Log Macros</button>
+                                {% endif %}
                             </form>
                         </div>
                     </div>

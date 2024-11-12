@@ -3,6 +3,13 @@ from models import User
 from application import db
 
 class CompletionLogService:
+    @staticmethod
+    def get_logs(user_id, date=None):
+        if date:
+            logs = CompletionLog.query.filter_by(user_id=user_id, date=date).all()
+        else:
+            logs = CompletionLog.query.filter_by(user_id=user_id).all()
+        return logs
     
     @staticmethod
     def delete_all_user_completion_logs(user_id):

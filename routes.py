@@ -123,10 +123,23 @@ def user_dashboard():
     habits = HabitService.list_habits(userid, current_date) #add date parameter
     completions = HabitCompletionService.get_completions(userid, current_date)
     completions_dict = {completion.habit_id: True for completion in completions}
+    log = CompletionLogService.get_logs(userid, current_date)
+    #ensure log is a single object or None
+    if log:
+        log = log[0]
+        log_data = {
+            'calories': log.calories,
+            'protein': log.protein,
+            'carbs': log.carbs,
+            'fats': log.fats,
+            'weightlbs': float(log.weightlbs)
+        }
+    else:
+        log_data = None
     
     return render_template('UserDashboard.html', userid=userid, habits=habits, current_date=current_date,
                            username=username, connected_coach=connected_coach, request=request,
-                           requested_coach=requested_coach, completions=completions_dict)
+                           requested_coach=requested_coach, completions=completions_dict, log=log_data)
 
 
 @application.route('/managehabits', methods=['POST'])
