@@ -21,5 +21,7 @@ Please note that some of these may not be required, but when troubleshooting we 
 ## Group Members
 - Ryan Rowe
 - Liam Salem
+- Spencer Choy
+## People who also worked on MacroMinder
 - Ori Adkins
 - Sam Zinn 
